@@ -7,6 +7,7 @@ import Statuses from './Statuses';
 import { UserType } from './types/UserType';
 import { SERVER_IP } from 'app/configs/routesConfig';
 import { ContactType } from './types/ContactType';
+import { ChatContactType } from './types/ChatContactType';
 
 const StyledBadge = styled(Badge)<{ statuscolor: string }>(({ theme, ...props }) => ({
     width: 40,
@@ -33,7 +34,7 @@ const StyledBadge = styled(Badge)<{ statuscolor: string }>(({ theme, ...props })
 }));
 
 type UserAvatarPropsType = {
-    user: PartialDeep<UserType & ContactType>;
+    user: PartialDeep<UserType & ChatContactType>;
     className?: string;
 };
 
@@ -54,7 +55,13 @@ function UserAvatar(props: UserAvatarPropsType) {
             statuscolor={status?.color}
         >
             <Avatar
-                src={user.user_photo_url ? SERVER_IP + user.user_photo_url : ''}
+                src={
+                    user.user_photo_url
+                        ? SERVER_IP + user.user_photo_url
+                        : user.contact_photo_url
+                        ? SERVER_IP + user.contact_photo_url
+                        : ''
+                }
                 alt={user?.user_name}
                 className="w-full h-full"
             >

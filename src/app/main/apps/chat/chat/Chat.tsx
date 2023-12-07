@@ -113,21 +113,13 @@ function Chat(props: ChatPropsType) {
     const routeParams = useParams();
     const chat_id = routeParams.id;
     const selectedChat = useAppSelector(selectChatById(chat_id));
-
     const chatRef = useRef<HTMLDivElement>(null);
     const [message_value, setMessageValue] = useState('');
-    const [contact, setContact] = useState<ContactType>();
 
-    console.log('selectedChat', selectedChat);
-
+    console.log('selectedChatselectedChat', selectedChat);
     useEffect(() => {
         dispatch(getMessages(chat_id));
     }, [chat_id, dispatch]);
-    useEffect(() => {
-        const selectedContact = useAppSelector(selectContactById(selectedChat.contact_id));
-        console.log('selectedContact', selectedContact);
-        setContact(selectedContact);
-    }, [selectedChat]);
 
     useEffect(() => {
         if (messages) {
@@ -169,7 +161,7 @@ function Chat(props: ChatPropsType) {
             sendMessage({
                 message_value,
                 chat_id: messages[0].chat_id,
-                contact_id: contact?.contact_id,
+                contact_id: selectedChat.contact_id,
                 user_id: user.user_id,
                 message_type: 'text',
             }),
@@ -212,9 +204,12 @@ function Chat(props: ChatPropsType) {
                             role="button"
                             tabIndex={0}
                         >
-                            <UserAvatar className="relative mx-8" user={contact} />
+                            <UserAvatar
+                                className="relative mx-8"
+                                user={selectedChat.chat_contact}
+                            />
                             <Typography color="inherit" className="text-16 font-semibold px-4">
-                                {contact?.contact_name}
+                                {selectedChat.chat_contact.contact_name}
                             </Typography>
                         </div>
                     </div>

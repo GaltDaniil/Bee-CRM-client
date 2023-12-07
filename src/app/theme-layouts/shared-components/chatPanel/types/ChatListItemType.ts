@@ -1,3 +1,4 @@
+import { ChatContactType } from './ChatContactType';
 import { MessageType } from './MessageType';
 
 /**
@@ -10,5 +11,6 @@ export type ChatListItemType = {
     chat_muted: boolean;
     lastMessage?: string;
     lastMessageAt?: string;
+    chat_contact: ChatContactType;
     messages?: MessageType[];
 };

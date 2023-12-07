@@ -1,3 +1,4 @@
+import { ChatContactType } from 'app/theme-layouts/shared-components/chatPanel/types/ChatContactType';
 import { MessageType } from './MessageType';
 
 /**
@@ -16,5 +17,6 @@ export type ChatListItemType = {
     from_url: string;
     lastMessage?: string;
     lastMessageAt?: string;
+    chat_contact: ChatContactType;
     messages: MessageType[];
 };

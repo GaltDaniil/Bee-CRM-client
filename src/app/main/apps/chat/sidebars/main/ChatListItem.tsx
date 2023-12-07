@@ -30,7 +30,6 @@ type ChatListItemProps = {
  */
 function ChatListItem(props: ChatListItemProps) {
     const { item } = props;
-    console.log(item);
 
     return (
         <StyledListItem
@@ -40,7 +39,7 @@ function ChatListItem(props: ChatListItemProps) {
             end
             activeClassName="active"
         >
-            <UserAvatar user={item} />
+            <UserAvatar user={item.chat_contact} />
 
             <ListItemText
                 classes={{
@@ -48,7 +47,7 @@ function ChatListItem(props: ChatListItemProps) {
                     primary: 'font-medium text-14',
                     secondary: 'truncate',
                 }}
-                primary={item.contact_name}
+                primary={item.chat_contact.contact_name}
                 secondary={item.lastMessage}
             />
 
