@@ -14,7 +14,6 @@ type AppRootStateType = RootStateType<chatMessagesSliceType>;
 export const getMessages = createAppAsyncThunk<ChatMessagesType, ChatMessageType['chat_id']>(
     'chatApp/chat/getMessages',
     async (chat_id) => {
-        console.log('getMessages');
         const response = await axios.get(`/api/messages/${chat_id}`);
 
         const data = (await response.data) as ChatMessagesType;

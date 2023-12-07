@@ -133,7 +133,6 @@ function ChatPanel() {
         },
         [dispatch],
     );
-    console.log('userData', userData);
     useEffect(() => {
         dispatch(getUserData(userData.user_id));
         dispatch(getContacts());

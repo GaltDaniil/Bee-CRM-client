@@ -116,7 +116,6 @@ function Chat(props: ChatPropsType) {
     const chatRef = useRef<HTMLDivElement>(null);
     const [message_value, setMessageValue] = useState('');
 
-    console.log('selectedChatselectedChat', selectedChat);
     useEffect(() => {
         dispatch(getMessages(chat_id));
     }, [chat_id, dispatch]);

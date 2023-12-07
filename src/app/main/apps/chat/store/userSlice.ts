@@ -13,7 +13,6 @@ type AppRootStateType = RootStateType<userSliceType>;
 export const getUserData = createAppAsyncThunk<UserType, UserType['user_id']>(
     'chatApp/user/getUserData',
     async (user_id) => {
-        console.log('getUserData');
         const response = await axios.get(`/api/chat/user/${user_id}`);
 
         const data = (await response.data) as UserType;

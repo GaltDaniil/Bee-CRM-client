@@ -15,7 +15,6 @@ export const getUserData = createAppAsyncThunk<UserType, UserType['user_id']>(
     'chatPanel/user/getUserData',
     async (user_id) => {
         const response = await axios.get(`/api/chat/user/${user_id}`);
-        console.log(response);
 
         const data = (await response.data) as UserType;
 

@@ -12,7 +12,6 @@ export type AppRootStateType = RootStateType<contactsSliceType>;
 export const getContacts = createAppAsyncThunk<ContactsType>(
     'chatApp/contacts/getContacts',
     async () => {
-        console.log('getContacts');
         const response = await axios.get('/api/chat/contacts');
 
         const data = (await response.data) as ContactsType;
