@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <link rel="stylesheet" type="text/css" href="widget.css" />
+    </head>
+    <body>
+        <div class="content">
+            <div
+                class="bee-button-holder bee-vertical"
+                style="
+                    position: fixed;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: end;
+                    z-index: 1000000;
+                    right: 50px;
+                    bottom: 50px;
+                    padding-top: 0px;
+                "
+            >
+                <iframe
+                    class="buttons-iframe"
+                    id="buttons-iframe"
+                    src="https://beechat.ru/buttons?accountId=ecfafe4bc756935e17d93bec"
+                    frameborder="0"
+                    width="160"
+                    scrolling="no"
+                    height="0"
+                    style="
+                        min-width: 160px;
+                        z-index: 1000001;
+                        top: inherit;
+                        right: 0px;
+                        left: inherit;
+                        min-height: 0px;
+                    "
+                ></iframe>
+                <div
+                    class="bee-button bee-main-button"
+                    style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 60px;
+                        height: 60px;
+                        z-index: 1000002;
+                        background-color: rgb(247, 168, 77);
+                        border-radius: 30px;
+                        float: right;
+                        opacity: 1;
+                    "
+                    id="bee-main-button"
+                >
+                    <img
+                        src="https://icon-library.com/images/white-chat-icon/white-chat-icon-27.jpg"
+                        alt="close"
+                        width="30"
+                        height="30"
+                    />
+                </div>
+                <div
+                    class="bee-button bee-close-widgets-button bee_hidden"
+                    style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 60px;
+                        height: 60px;
+                        z-index: 1000002;
+                        background-color: rgb(247, 168, 77);
+                        border-radius: 30px;
+                        float: right;
+                        opacity: 1;
+                    "
+                    id="bee-close-widgets-button"
+                >
+                    <img
+                        src="https://flaticons.net/icon.php?slug_category=mobile-application&slug_icon=close"
+                        alt="close"
+                        width="20"
+                        height="20"
+                    />
+                </div>
+                <div id="bee-livechat" class="bee-livechat bee_hidden">
+                    <iframe
+                        class="livechat-iframe"
+                        id="livechat-iframe"
+                        src="https://beechat.ru/beechat"
+                        frameborder="0"
+                    ></iframe>
+                </div>
+            </div>
+        </div>
+        <script src="./widget.js"></script>
+    </body>
+</html>

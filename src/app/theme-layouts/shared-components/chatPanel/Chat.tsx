@@ -98,7 +98,7 @@ function Chat(props: ChatProps) {
     const { className } = props;
     const dispatch = useAppDispatch();
     const selectedContactId = useAppSelector(selectSelectedContactId);
-    const chat = useAppSelector(selectChat);
+    const messages = useAppSelector(selectChat);
     const user = useAppSelector(selectUser);
 
     const chatScroll = useRef<HTMLDivElement>(null);
@@ -106,7 +106,7 @@ function Chat(props: ChatProps) {
 
     useEffect(() => {
         scrollToBottom();
-    }, [chat]);
+    }, [messages]);
 
     function scrollToBottom() {
         if (!chatScroll.current) {
@@ -136,19 +136,19 @@ function Chat(props: ChatProps) {
                         function isFirstMessageOfGroup(item: ChatMessageType, i: number) {
                             return (
                                 i === 0 ||
-                                (chat[i - 1] && chat[i - 1].contact_id !== item.contact_id)
+                                (messages[i - 1] && messages[i - 1].contact_id !== item.contact_id)
                             );
                         }
 
                         function isLastMessageOfGroup(item: ChatMessageType, i: number) {
                             return (
-                                i === chat.length - 1 ||
-                                (chat[i + 1] && chat[i + 1].contact_id !== item.contact_id)
+                                i === messages.length - 1 ||
+                                (messages[i + 1] && messages[i + 1].contact_id !== item.contact_id)
                             );
                         }
 
-                        return chat?.length > 0
-                            ? chat.map((item, i) => {
+                        return messages?.length > 0
+                            ? messages.map((item, i) => {
                                   return (
                                       <StyledMessageRow
                                           key={i}
@@ -157,7 +157,7 @@ function Chat(props: ChatProps) {
                                               item.contact_id === user.user_id ? 'me' : 'contact',
                                               { 'first-of-group': isFirstMessageOfGroup(item, i) },
                                               { 'last-of-group': isLastMessageOfGroup(item, i) },
-                                              i + 1 === chat.length && 'pb-72',
+                                              i + 1 === messages.length && 'pb-72',
                                           )}
                                       >
                                           <div className="bubble flex relative items-center justify-center p-12 max-w-full">
@@ -177,10 +177,10 @@ function Chat(props: ChatProps) {
                                   );
                               })
                             : null;
-                    }, [chat, user?.user_id])}
+                    }, [messages, user?.user_id])}
                 </div>
 
-                {chat?.length === 0 && (
+                {messages?.length === 0 && (
                     <div className="flex flex-col flex-1">
                         <div className="flex flex-col flex-1 items-center justify-center">
                             <FuseSvgIcon size={128} color="disabled">
@@ -210,7 +210,7 @@ function Chat(props: ChatProps) {
                     });
                 };
 
-                return chat ? (
+                return messages ? (
                     <form
                         onSubmit={onMessageSubmit}
                         className="pb-16 px-8 absolute bottom-0 left-0 right-0"
@@ -236,7 +236,7 @@ function Chat(props: ChatProps) {
                         </Paper>
                     </form>
                 ) : null;
-            }, [chat, dispatch, message_value, selectedContactId])}
+            }, [messages, dispatch, message_value, selectedContactId])}
         </Paper>
     );
 }

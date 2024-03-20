@@ -41,10 +41,11 @@ type UserAvatarPropsType = {
 /**
  * The user avatar component.
  */
+
 function UserAvatar(props: UserAvatarPropsType) {
     const { user, className } = props;
 
-    const status = _.find(Statuses, { value: user?.user_status });
+    const status = _.find(Statuses, { value: user.user_status || user.contact_status });
 
     return (
         <StyledBadge

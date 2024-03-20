@@ -8,9 +8,10 @@ import { FuseSettingsConfigType } from '@fuse/core/FuseSettings/FuseSettings';
 import { AppDispatchType, RootStateType } from 'app/store/types';
 import { UserType } from 'app/store/user';
 import { PartialDeep } from 'type-fest';
-import { AxiosError } from 'axios/index';
+import axios, { AxiosError } from 'axios';
 import jwtService from '../../auth/services/jwtService';
 import createAppAsyncThunk from '../createAppAsyncThunk';
+import { UserListType } from './UserListType';
 
 type AppRootStateType = RootStateType<userSliceType>;
 
@@ -27,6 +28,22 @@ export const setUser = createAsyncThunk('user/setUser', (user: UserType) => {
 
     return Promise.resolve(user);
 });
+
+export const createUser = createAsyncThunk(
+    'user/createUser',
+    async (params: {
+        user_name: string;
+        user_password: string;
+        user_email: string;
+        user_role: string;
+    }) => {
+        const response = await axios.post('api/users', params);
+
+        const data = (await response.data) as UserType;
+
+        return data;
+    },
+);
 
 /**
  * Updates the user's settings in the Redux store and returns the updated user object.

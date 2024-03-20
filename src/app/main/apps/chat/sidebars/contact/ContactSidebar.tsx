@@ -7,19 +7,26 @@ import { useContext } from 'react';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { lighten } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import { useAppSelector } from 'app/store';
-import { selectContactById } from '../../store/contactsSlice';
+import { useAppDispatch, useAppSelector } from 'app/store';
+import { getContactByChatId, selectChatContact } from '../../store/contactsSlice';
 import UserAvatar from '../../UserAvatar';
 import { ChatAppContext } from '../../ChatApp';
+import { selectChatById } from '../../store/chatListSlice';
+import { useEffect } from 'react';
 
-/**
- * The contact sidebar.
- */
 function ContactSidebar() {
+    const dispatch = useAppDispatch();
     const { setContactSidebarOpen } = useContext(ChatAppContext);
     const routeParams = useParams();
-    const contact_id = routeParams.id;
-    const contact = useAppSelector(selectContactById(contact_id));
+    const chat_id = routeParams.id;
+    const selectedChat = useAppSelector(selectChatById(chat_id));
+    const { data: contact } = useAppSelector(selectChatContact);
+
+    useEffect(() => {
+        if (selectedChat) {
+            dispatch(getContactByChatId(selectedChat.contact_id));
+        }
+    }, [selectedChat]);
 
     if (!contact) {
         return null;
@@ -49,7 +56,7 @@ function ContactSidebar() {
                         color="inherit"
                         variant="subtitle1"
                     >
-                        Contact info
+                        Информация о контакте
                     </Typography>
                 </Toolbar>
             </Box>
@@ -65,7 +72,7 @@ function ContactSidebar() {
                 </Typography>
             </div>
             <div className="w-full p-24">
-                {contact.attachments?.media && (
+                {/* {contact.attachments?.media && (
                     <>
                         <Typography className="mt-16 text-16 font-medium">Media</Typography>
                         <div className="grid grid-cols-4 gap-4 mt-16">
@@ -79,16 +86,16 @@ function ContactSidebar() {
                             ))}
                         </div>
                     </>
-                )}
+                )} */}
 
-                <Typography className="mt-40 text-16 font-medium">Details</Typography>
+                <Typography className="mt-40 text-16 font-medium">Детали</Typography>
 
                 <div className="mt-16">
                     <Typography className="text-14 font-medium" color="text.secondary">
-                        Emails
+                        Email
                     </Typography>
-
-                    {contact.details.emails?.map((item, index) => (
+                    <Typography>{contact.contact_email}</Typography>
+                    {/* {contact.details.emails?.map((item, index) => (
                         <div className="flex items-center" key={index}>
                             <Typography>{item.email}</Typography>
                             {item.label && (
@@ -98,15 +105,16 @@ function ContactSidebar() {
                                 </Typography>
                             )}
                         </div>
-                    ))}
+                    ))} */}
                 </div>
 
                 <div className="mt-16">
                     <Typography className="text-14 font-medium" color="text.secondary">
-                        Phone numbers
+                        Номер телефона
                     </Typography>
+                    <Typography>{contact.contact_phone}</Typography>
 
-                    {contact.details.phoneNumbers?.map((item, index) => (
+                    {/* {contact.details.phoneNumbers?.map((item, index) => (
                         <div className="flex items-center" key={index}>
                             <Typography>{item.phoneNumber}</Typography>
                             {item.label && (
@@ -116,24 +124,39 @@ function ContactSidebar() {
                                 </Typography>
                             )}
                         </div>
-                    ))}
+                    ))} */}
                 </div>
 
                 <div className="mt-16">
+                    <Typography className="text-14 font-medium" color="text.secondary">
+                        Контакт с сайта
+                    </Typography>
+                    <Typography>{selectedChat.from_url ? selectedChat.from_url : 'нет'}</Typography>
+                </div>
+                <div className="mt-16">
+                    <Typography className="text-14 font-medium" color="text.secondary">
+                        Username
+                    </Typography>
+                    <Typography>
+                        {selectedChat.messenger_username ? selectedChat.messenger_username : 'нет'}
+                    </Typography>
+                </div>
+
+                {/* <div className="mt-16">
                     <Typography className="text-14 font-medium" color="text.secondary">
                         Title
                     </Typography>
 
                     <Typography>{contact.details.title}</Typography>
-                </div>
+                </div> */}
 
-                <div className="mt-16">
+                {/* <div className="mt-16">
                     <Typography className="text-14 font-medium" color="text.secondary">
                         Company
                     </Typography>
 
                     <Typography>{contact.details.company}</Typography>
-                </div>
+                </div> */}
 
                 {/* <div className="mt-16">
 					<Typography
@@ -146,13 +169,13 @@ function ContactSidebar() {
 					<Typography>{format(new Date(contact.details.birthday), 'P')}</Typography>
 				</div> */}
 
-                <div className="mt-16">
+                {/* <div className="mt-16">
                     <Typography className="text-14 font-medium" color="text.secondary">
                         Address
                     </Typography>
 
                     <Typography>{contact.details.address}</Typography>
-                </div>
+                </div> */}
             </div>
         </div>
     );

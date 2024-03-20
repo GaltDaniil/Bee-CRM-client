@@ -7,6 +7,7 @@ import { MessageType } from './MessageType';
 export type ChatListItemType = {
     chat_id: string;
     contact_id: string;
+    messenger_id: string;
     unread_count: number;
     chat_muted: boolean;
     lastMessage?: string;

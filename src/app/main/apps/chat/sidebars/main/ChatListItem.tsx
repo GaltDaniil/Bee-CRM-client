@@ -10,6 +10,7 @@ import { NavLinkAdapterPropsType } from '@fuse/core/NavLinkAdapter/NavLinkAdapte
 import UserAvatar from '../../UserAvatar';
 import { ContactType } from '../../types/ContactType';
 import { ChatListItemType } from '../../types/ChatListItemType';
+import React from 'react';
 
 type ExtendedListItemProps = NavLinkAdapterPropsType & {
     component: React.ElementType<NavLinkAdapterPropsType>;
@@ -30,7 +31,6 @@ type ChatListItemProps = {
  */
 function ChatListItem(props: ChatListItemProps) {
     const { item } = props;
-
     return (
         <StyledListItem
             component={NavLinkAdapter}
@@ -62,11 +62,13 @@ function ChatListItem(props: ChatListItemProps) {
                         </Typography>
                     )}
                     <div className="items-center">
-                        {item.chat_muted && (
-                            <FuseSvgIcon size={20} color="disabled">
-                                heroicons-solid:volume-off
-                            </FuseSvgIcon>
-                        )}
+                        {item.messenger_type ? (
+                            <img
+                                className="w-20 h-20 mb-4 opacity-50"
+                                src={`assets/icons/${item.messenger_type}.png`}
+                                alt="messenger_logo"
+                            />
+                        ) : null}
                         {Boolean(item.unread_count) && (
                             <Box
                                 sx={{

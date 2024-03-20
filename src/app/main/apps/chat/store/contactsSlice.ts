@@ -1,8 +1,9 @@
 import { createEntityAdapter, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 import createAppAsyncThunk from 'app/store/createAppAsyncThunk';
-import { RootStateType } from 'app/store/types';
-import { ContactsType, ContactType } from '../types/ContactType';
+import { AsyncStateType, RootStateType } from 'app/store/types';
+import { ChatFullContactType, ContactsType, ContactType } from '../types/ContactType';
+import { ChatListItemType } from '../types/ChatListItemType';
 
 export type AppRootStateType = RootStateType<contactsSliceType>;
 
@@ -20,17 +21,21 @@ export const getContacts = createAppAsyncThunk<ContactsType>(
     },
 );
 
-const contactsAdapter = createEntityAdapter<ContactType>({
-    selectId: (contact) => contact.contact_id,
+export const getContactByChatId = createAppAsyncThunk<
+    ChatFullContactType,
+    ChatListItemType['contact_id']
+>('chatApp/contacts/getContacts', async (contact_id) => {
+    const response = await axios.get(`/api/chat/contact/${contact_id}`);
+
+    const data = (await response.data) as ChatFullContactType;
+
+    return data;
 });
 
-const initialState = contactsAdapter.getInitialState();
-
-export const {
-    selectAll: selectContacts,
-    selectEntities: selectContactsEntities,
-    selectById,
-} = contactsAdapter.getSelectors((state: AppRootStateType) => state.chatApp.contacts);
+const initialState: AsyncStateType<ChatFullContactType> = {
+    data: null,
+    status: 'idle',
+};
 
 /**
  * Chat App Contacts Slice
@@ -40,14 +45,18 @@ export const contactsSlice = createSlice({
     initialState,
     reducers: {},
     extraReducers: (builder) => {
-        builder.addCase(getContacts.fulfilled, (state, action) =>
-            contactsAdapter.setAll(state, action.payload),
-        );
+        builder
+            .addCase(getContactByChatId.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(getContactByChatId.fulfilled, (state, action) => {
+                state.data = action.payload;
+                state.status = 'succeeded';
+            });
     },
 });
 
-export const selectContactById = (id: ContactType['contact_id']) => (state: AppRootStateType) =>
-    selectById(state, id);
+export const selectChatContact = (state: AppRootStateType) => state.chatApp.contacts;
 
 export type contactsSliceType = typeof contactsSlice;
 

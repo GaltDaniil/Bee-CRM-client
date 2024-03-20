@@ -9,25 +9,28 @@ import SignOutConfig from '../main/sign-out/SignOutConfig';
 import Error404Page from '../main/404/Error404Page';
 import ExampleConfig from '../main/example/ExampleConfig';
 import appsConfigs from '../main/apps/appsConfigs';
+import Chat from '../main/apps/chat/chat/Chat';
+import BeeChatConfig from '../main/beechat/BeeChatConfig';
 
 const routeConfigs: FuseRouteConfigsType = [
     ExampleConfig,
     SignOutConfig,
     SignInConfig,
     SignUpConfig,
+    BeeChatConfig,
     ...appsConfigs,
 ];
 
 /**
  * The routes of the application.
  */
-export const SERVER_IP = 'http://localhost:5500/';
+export const SERVER_IP = 'https://beechat.ru/';
 
 const routes: FuseRoutesType = [
     ...FuseUtils.generateRoutesFromConfigs(routeConfigs, settingsConfig.defaultAuth),
     {
         path: '/',
-        element: <Navigate to="/example" />,
+        element: <Navigate to="/apps/chat" />,
         auth: settingsConfig.defaultAuth,
     },
     {

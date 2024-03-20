@@ -4,6 +4,7 @@ import axios from 'axios';
 import { RootStateType } from 'app/store/types';
 import { ChatListItemType } from '../types/ChatListItemType';
 import { ChatListType } from '../types/ChatListType';
+import { ContactType } from '../types/ContactType';
 
 type AppRootStateType = RootStateType<chatListSliceType>;
 
@@ -17,6 +18,35 @@ export const getChatList = createAppAsyncThunk<ChatListType>('chatApp/chatList/g
 
     return data;
 });
+
+export const getChat = createAppAsyncThunk<ChatListItemType, ChatListItemType['chat_id']>(
+    'chatApp/chatList/getOne',
+    async (chat_id) => {
+        const response = await axios.get(`/api/chat/${chat_id}`);
+        const data = (await response.data) as ChatListItemType;
+
+        return data;
+    },
+);
+
+export const getChatByContactId = createAppAsyncThunk<ChatListItemType, ContactType['contact_id']>(
+    'chatApp/chatList/getOneByContactId',
+    async (contact_id) => {
+        const response = await axios.get(`/api/chat/bycontact/${contact_id}`);
+        const data = (await response.data) as ChatListItemType;
+        return data;
+    },
+);
+
+export const readChatMessages = createAppAsyncThunk<ChatListItemType, ChatListItemType['chat_id']>(
+    'chatApp/chatList/read',
+    async (chat_id) => {
+        const response = await axios.patch(`/api/chat/${chat_id}/read-all`);
+        const data = (await response.data) as ChatListItemType;
+        getChatList();
+        return data;
+    },
+);
 
 const chatsAdapter = createEntityAdapter<ChatListItemType>({
     selectId: (chat) => chat.chat_id,
@@ -38,14 +68,23 @@ export const selectChatById = (id: ChatListItemType['chat_id']) => (state: AppRo
 export const chatListSlice = createSlice({
     name: 'chatApp/chatList',
     initialState,
-    reducers: {},
+    reducers: {
+        readChat(state, action) {
+            console.log('action', action);
+        },
+    },
     extraReducers: (builder) => {
         builder.addCase(getChatList.fulfilled, (state, action) =>
             chatsAdapter.setAll(state, action.payload),
         );
+        builder.addCase(readChatMessages.fulfilled, (state, action) => {
+            const updatedChat: ChatListItemType = action.payload;
+            chatsAdapter.updateOne(state, { id: updatedChat.chat_id, changes: updatedChat });
+        });
     },
 });
 
 export type chatListSliceType = typeof chatListSlice;
+export const { readChat } = chatListSlice.actions;
 
 export default chatListSlice.reducer;

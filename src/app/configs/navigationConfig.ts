@@ -23,14 +23,6 @@ const navigationConfig: FuseNavigationType = [
         translate: 'APPLICATIONS',
         children: [
             {
-                id: 'example-component',
-                title: 'Example',
-                translate: 'EXAMPLE',
-                type: 'item',
-                icon: 'heroicons-outline:star',
-                url: 'example',
-            },
-            {
                 id: 'apps.chat',
                 title: 'Chat',
                 type: 'item',
@@ -45,6 +37,22 @@ const navigationConfig: FuseNavigationType = [
                 icon: 'heroicons-outline:user-group',
                 url: '/apps/contacts',
                 translate: 'CONTACTS',
+            },
+            {
+                id: 'apps.settings',
+                title: 'Settings',
+                type: 'item',
+                icon: 'material-outline:settings',
+                url: '/apps/setting',
+                translate: 'SETTINGS',
+            },
+            {
+                id: 'apps.scrumboard',
+                title: 'Scrumboard',
+                type: 'item',
+                icon: 'heroicons-outline:view-boards',
+                url: '/apps/scrumboard',
+                translate: 'CRM',
             },
         ],
     },

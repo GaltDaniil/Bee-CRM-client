@@ -12,7 +12,7 @@ type AppRootStateType = RootStateType<chatMessagesSliceType>;
  * Get chat
  */
 export const getMessages = createAppAsyncThunk<ChatMessagesType, ChatMessageType['chat_id']>(
-    'chatApp/chat/getMessages',
+    'chatApp/messages/getMessages',
     async (chat_id) => {
         const response = await axios.get(`/api/messages/${chat_id}`);
 
@@ -30,11 +30,13 @@ export const sendMessage = createAppAsyncThunk<
     {
         message_value: string;
         chat_id: string;
-        user_id: string;
+        manager_id: string;
         message_type: string;
         contact_id: string;
+        messenger_type: string;
+        messenger_id: string;
     }
->('chatApp/chat/sendMessage', async (params, { dispatch }) => {
+>('chatApp/messages/sendMessage', async (params, { dispatch }) => {
     const response = await axios.post(`/api/messages/`, params);
 
     const data = (await response.data) as ChatMessageType;
@@ -55,7 +57,9 @@ export const chatMessagesSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
-            .addCase(getMessages.fulfilled, (state, action) => action.payload)
+            .addCase(getMessages.fulfilled, (state, action) =>
+                action.payload.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt)),
+            )
             .addCase(sendMessage.fulfilled, (state, action) => [...state, action.payload]);
     },
 });

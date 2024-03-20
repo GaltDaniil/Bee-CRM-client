@@ -62,7 +62,7 @@ function ChatApp() {
 
     useEffect(() => {
         dispatch(getUserData(userData.user_id));
-        dispatch(getContacts());
+        //dispatch(getContacts());
         dispatch(getChatList());
     }, [dispatch]);
 

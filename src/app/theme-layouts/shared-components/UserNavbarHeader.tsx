@@ -40,7 +40,7 @@ function UserNavbarHeader() {
                         color: 'text.secondary',
                     }}
                     className="avatar h-96 w-96 text-32 font-bold"
-                    src={user.data.user_photo_url}
+                    src={`https://beechat.ru/${user.data.user_photo_url}`}
                     alt={user.data.user_name}
                 >
                     {user.data.user_name.charAt(0)}

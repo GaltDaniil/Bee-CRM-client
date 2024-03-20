@@ -12,13 +12,14 @@ import Box from '@mui/material/Box';
 import { lighten } from '@mui/material/styles';
 import { useAppDispatch, useAppSelector } from 'app/store';
 //import ContactListItem from './ContactListItem';
-import { selectContacts } from '../../store/contactsSlice';
-import { selectChats } from '../../store/chatListSlice';
+import { getChatList, selectChats } from '../../store/chatListSlice';
 import UserAvatar from '../../UserAvatar';
 import MainSidebarMoreMenu from './MainSidebarMoreMenu';
 import { ChatAppContext } from '../../ChatApp';
 import { selectUser } from '../../store/userSlice';
 import ChatListItem from './ChatListItem';
+import React from 'react';
+import socket from 'src/app/socket';
 
 /**
  * The main sidebar.
@@ -27,15 +28,23 @@ function MainSidebar() {
     const { setUserSidebarOpen } = useContext(ChatAppContext);
 
     const dispatch = useAppDispatch();
-    const contacts = useAppSelector(selectContacts);
+    //const contacts = useAppSelector(selectContacts);
     const chats = useAppSelector(selectChats);
     const { data: user } = useAppSelector(selectUser);
+    console.log(chats);
 
     const [searchText, setSearchText] = useState('');
 
     function handleSearchText(event: React.ChangeEvent<HTMLInputElement>) {
         setSearchText(event.target.value);
     }
+
+    React.useEffect(() => {
+        socket.on('update', () => {
+            dispatch(getChatList());
+            console.log('update');
+        });
+    }, []);
 
     return (
         <div className="flex flex-col flex-auto h-full">
@@ -100,7 +109,7 @@ function MainSidebar() {
                         }
 
                         const chatListContacts =
-                            contacts.length > 0 && chats.length > 0
+                            chats.length > 0
                                 ? chats.map((_chat) => ({
                                       ..._chat,
                                       /* ...contacts.find(
@@ -147,18 +156,25 @@ function MainSidebar() {
                                     </motion.div>
                                 )}
 
-                                {filteredChatList.map((chat, index) => (
-                                    <motion.div variants={item} key={chat.chat_id}>
-                                        <div
-                                            className={clsx(
-                                                filteredChatList.length !== index + 1 &&
-                                                    'border-b-1',
-                                            )}
-                                        >
-                                            <ChatListItem item={chat} />
-                                        </div>
-                                    </motion.div>
-                                ))}
+                                {filteredChatList
+                                    .filter((el) => el.lastMessage)
+                                    .sort(
+                                        (a, b) =>
+                                            Date.parse(b.lastMessageAt) -
+                                            Date.parse(a.lastMessageAt),
+                                    )
+                                    .map((chat, index) => (
+                                        <motion.div variants={item} key={chat.chat_id}>
+                                            <div
+                                                className={clsx(
+                                                    filteredChatList.length !== index + 1 &&
+                                                        'border-b-1',
+                                                )}
+                                            >
+                                                <ChatListItem item={chat} />
+                                            </div>
+                                        </motion.div>
+                                    ))}
 
                                 {/* {filteredContacts.length > 0 && (
                                     <motion.div variants={item}>
@@ -185,7 +201,7 @@ function MainSidebar() {
                                 ))} */}
                             </motion.div>
                         );
-                    }, [contacts, chats, searchText, dispatch])}
+                    }, [chats, searchText, dispatch])}
                 </List>
             </FuseScrollbars>
         </div>

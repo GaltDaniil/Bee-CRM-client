@@ -2,8 +2,10 @@ import { FuseRouteConfigsType } from '@fuse/utils/FuseUtils';
 /* import AcademyAppConfig from './academy/AcademyAppConfig';
 import CalendarAppConfig from './calendar/CalendarAppConfig'; */
 import ChatAppConfig from './chat/ChatAppConfig';
-/* import ContactsAppConfig from './contacts/ContactsAppConfig';
-import ECommerceAppConfig from './e-commerce/ECommerceAppConfig';
+import SettingAppConfig from './settings/SettingAppConfig';
+import ContactsAppConfig from './contacts/ContactsAppConfig';
+import ScrumboardAppConfig from './scrumboard/ScrumboardAppConfig';
+/* import ECommerceAppConfig from './e-commerce/ECommerceAppConfig';
 import FileManagerAppConfig from './file-manager/FileManagerAppConfig';
 import HelpCenterAppConfig from './help-center/HelpCenterAppConfig';
 import MailboxAppConfig from './mailbox/MailboxAppConfig';
@@ -19,14 +21,15 @@ const appsConfigs: FuseRouteConfigsType = [
     //AcademyAppConfig,
     //CalendarAppConfig,
     ChatAppConfig,
-    //ContactsAppConfig,
+    SettingAppConfig,
+    ContactsAppConfig,
     //ECommerceAppConfig,
     //FileManagerAppConfig,
     //HelpCenterAppConfig,
     //MailboxAppConfig,
     //NotesAppConfig,
     //ProfileAppConfig,
-    //ScrumboardAppConfig,
+    ScrumboardAppConfig,
     //TasksAppConfig,
 ];
 

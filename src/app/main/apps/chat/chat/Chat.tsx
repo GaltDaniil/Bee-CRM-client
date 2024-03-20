@@ -12,16 +12,13 @@ import { useParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import { useAppDispatch, useAppSelector } from 'app/store';
 import { getMessages, selectMessages, sendMessage } from '../store/chatMessagesSlice';
-import { selectContactById } from '../store/contactsSlice';
 import { selectUser } from '../store/userSlice';
 import UserAvatar from '../UserAvatar';
 import ChatMoreMenu from './ChatMoreMenu';
 import { ChatAppContext } from '../ChatApp';
 import { ChatMessageType } from '../types/ChatMessageType';
 import Error404Page from '../../../404/Error404Page';
-import { selectChatById } from '../store/chatListSlice';
-import { ChatListItemType } from '../types/ChatListItemType';
-import { ContactType } from '../types/ContactType';
+import { getChatList, readChatMessages, selectChatById } from '../store/chatListSlice';
 
 const StyledMessageRow = styled('div')(({ theme }) => ({
     '&.contact': {
@@ -118,6 +115,8 @@ function Chat(props: ChatPropsType) {
 
     useEffect(() => {
         dispatch(getMessages(chat_id));
+        dispatch(getChatList());
+        if (selectedChat) dispatch(readChatMessages(chat_id));
     }, [chat_id, dispatch]);
 
     useEffect(() => {
@@ -155,14 +154,15 @@ function Chat(props: ChatPropsType) {
         if (message_value === '') {
             return;
         }
-
         dispatch(
             sendMessage({
                 message_value,
                 chat_id: messages[0].chat_id,
                 contact_id: selectedChat.contact_id,
-                user_id: user.user_id,
+                manager_id: user.user_id,
                 message_type: 'text',
+                messenger_type: selectedChat.messenger_type,
+                messenger_id: selectedChat.messenger_id,
             }),
         ).then(() => {
             setMessageValue('');
@@ -194,23 +194,25 @@ function Chat(props: ChatPropsType) {
                         >
                             <FuseSvgIcon>heroicons-outline:chat</FuseSvgIcon>
                         </IconButton>
-                        <div
-                            className="flex items-center cursor-pointer"
-                            onClick={() => {
-                                setContactSidebarOpen(true);
-                            }}
-                            onKeyDown={() => setContactSidebarOpen(true)}
-                            role="button"
-                            tabIndex={0}
-                        >
-                            <UserAvatar
-                                className="relative mx-8"
-                                user={selectedChat.chat_contact}
-                            />
-                            <Typography color="inherit" className="text-16 font-semibold px-4">
-                                {selectedChat.chat_contact.contact_name}
-                            </Typography>
-                        </div>
+                        {selectedChat ? (
+                            <div
+                                className="flex items-center cursor-pointer"
+                                onClick={() => {
+                                    setContactSidebarOpen(true);
+                                }}
+                                onKeyDown={() => setContactSidebarOpen(true)}
+                                role="button"
+                                tabIndex={0}
+                            >
+                                <UserAvatar
+                                    className="relative mx-8"
+                                    user={selectedChat?.chat_contact}
+                                />
+                                <Typography color="inherit" className="text-16 font-semibold px-4">
+                                    {selectedChat?.chat_contact.contact_name}
+                                </Typography>
+                            </div>
+                        ) : null}
                     </div>
                     <ChatMoreMenu className="-mx-8" />
                 </Toolbar>
@@ -234,7 +236,9 @@ function Chat(props: ChatPropsType) {
                                                         i,
                                                     ),
                                                 },
-                                                { 'last-of-group': isLastMessageOfGroup(item, i) },
+                                                {
+                                                    'last-of-group': isLastMessageOfGroup(item, i),
+                                                },
                                                 i + 1 === messages.length && 'pb-96',
                                             )}
                                         >
@@ -242,6 +246,7 @@ function Chat(props: ChatPropsType) {
                                                 <div className="leading-tight whitespace-pre-wrap">
                                                     {item.message_value}
                                                 </div>
+
                                                 <Typography
                                                     className="time absolute hidden w-full text-11 mt-8 -mb-24 ltr:left-0 rtl:right-0 bottom-0 whitespace-nowrap"
                                                     color="text.secondary"

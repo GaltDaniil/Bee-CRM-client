@@ -16,75 +16,79 @@ import ToolbarLayout1 from './components/ToolbarLayout1';
 import SettingsPanel from '../shared-components/SettingsPanel';
 
 const Root = styled('div')(({ config }: { config: Layout1ConfigDefaultsType }) => ({
-	...(config.mode === 'boxed' && {
-		clipPath: 'inset(0)',
-		maxWidth: `${config.containerWidth}px`,
-		margin: '0 auto',
-		boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-	}),
-	...(config.mode === 'container' && {
-		'& .container': {
-			maxWidth: `${config.containerWidth}px`,
-			width: '100%',
-			margin: '0 auto'
-		}
-	})
+    ...(config.mode === 'boxed' && {
+        clipPath: 'inset(0)',
+        maxWidth: `${config.containerWidth}px`,
+        margin: '0 auto',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+    }),
+    ...(config.mode === 'container' && {
+        '& .container': {
+            maxWidth: `${config.containerWidth}px`,
+            width: '100%',
+            margin: '0 auto',
+        },
+    }),
 }));
 
 type Layout1Props = {
-	children?: ReactNode;
+    children?: ReactNode;
 };
 
 /**
  * The layout 1.
  */
 function Layout1(props: Layout1Props) {
-	const { children } = props;
-	const config = useSelector(selectFuseCurrentLayoutConfig) as Layout1ConfigDefaultsType;
-	const appContext = useContext(AppContext);
-	const { routes } = appContext;
+    const { children } = props;
+    const config = useSelector(selectFuseCurrentLayoutConfig) as Layout1ConfigDefaultsType;
+    const appContext = useContext(AppContext);
+    const { routes } = appContext;
 
-	return (
-		<Root
-			id="fuse-layout"
-			config={config}
-			className="flex w-full"
-		>
-			{config.leftSidePanel.display && <LeftSideLayout1 />}
+    return (
+        <Root id="fuse-layout" config={config} className="flex w-full">
+            {config.leftSidePanel.display && <LeftSideLayout1 />}
 
-			<div className="flex min-w-0 flex-auto">
-				{config.navbar.display && config.navbar.position === 'left' && <NavbarWrapperLayout1 />}
+            <div className="flex min-w-0 flex-auto">
+                {config.navbar.display && config.navbar.position === 'left' && (
+                    <NavbarWrapperLayout1 />
+                )}
 
-				<main
-					id="fuse-main"
-					className="relative z-10 flex min-h-full min-w-0 flex-auto flex-col"
-				>
-					{config.toolbar.display && (
-						<ToolbarLayout1 className={config.toolbar.style === 'fixed' ? 'sticky top-0' : ''} />
-					)}
+                <main
+                    id="fuse-main"
+                    className="relative z-10 flex min-h-full min-w-0 flex-auto flex-col"
+                >
+                    {config.toolbar.display && (
+                        <ToolbarLayout1
+                            className={config.toolbar.style === 'fixed' ? 'sticky top-0' : ''}
+                        />
+                    )}
 
-					<div className="sticky top-0 z-99">
+                    {/* <div className="sticky top-0 z-99">
 						<SettingsPanel />
-					</div>
+					</div> */}
 
-					<div className="relative z-10 flex min-h-0 flex-auto flex-col">
-						<FuseDialog />
-						<FuseSuspense>{useRoutes(routes)}</FuseSuspense>
-						{children}
-					</div>
+                    <div className="relative z-10 flex min-h-0 flex-auto flex-col">
+                        <FuseDialog />
+                        <FuseSuspense>{useRoutes(routes)}</FuseSuspense>
+                        {children}
+                    </div>
 
-					{config.footer.display && (
-						<FooterLayout1 className={config.footer.style === 'fixed' ? 'sticky bottom-0' : ''} />
-					)}
-				</main>
+                    {config.footer.display && (
+                        <FooterLayout1
+                            className={config.footer.style === 'fixed' ? 'sticky bottom-0' : ''}
+                        />
+                    )}
+                </main>
 
-				{config.navbar.display && config.navbar.position === 'right' && <NavbarWrapperLayout1 />}
-			</div>
+                {config.navbar.display && config.navbar.position === 'right' && (
+                    <NavbarWrapperLayout1 />
+                )}
+            </div>
 
-			{config.rightSidePanel.display && <RightSideLayout1 />}
-			<FuseMessage />
-		</Root>
-	);
+            {config.rightSidePanel.display && <RightSideLayout1 />}
+            <FuseMessage />
+        </Root>
+    );
 }
 
 export default memo(Layout1);

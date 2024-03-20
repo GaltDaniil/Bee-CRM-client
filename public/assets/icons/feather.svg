@@ -266,6 +266,7 @@
             <path fill="none" stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor"
                   d="M12 6v6l4 2"/>
         </svg>
+        
         <svg id="cloud-drizzle" viewBox="0 0 24 24">
             <path fill="none" stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor"
                   d="M8 19v2M8 13v2M16 19v2M16 13v2M12 21v2M12 15v2M20 16.58c1.778-.793 2.994-2.544 2.994-4.58A5 5 0 0018 7h-1.26c-.92-3.478-4.038-6-7.746-6a8 8 0 00-5.01 14.238L4 15.25"/>

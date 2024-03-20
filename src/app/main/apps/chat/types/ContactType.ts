@@ -14,6 +14,16 @@ export type ContactType = {
     details: Partial<ContactDetailsType>;
     attachments: ContactAttachmentsType;
 };
+export type ChatFullContactType = {
+    contact_id: string;
+    contact_photo_url: string;
+    contact_name: string;
+    contact_about: string;
+    contact_status: ContactStatusType;
+    contact_email: string;
+    contact_phone: string;
+    contact_from_url: string;
+};
 
 export type ContactTypeDemo = {
     contact_id: string;
