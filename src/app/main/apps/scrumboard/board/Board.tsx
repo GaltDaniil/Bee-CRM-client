@@ -65,6 +65,7 @@ function Board() {
 
         // reordering list
         if (result.type === 'list') {
+            console.log(result);
             dispatch(reorderList(result));
         }
 
@@ -99,7 +100,7 @@ function Board() {
                                     {(provided) => (
                                         <div
                                             ref={provided.innerRef}
-                                            className="flex py-16 md:py-24 px-8 md:px-12"
+                                            className="flex py-16 md:py-24 px-8 md:px-12 max-h-full"
                                         >
                                             {board.board_lists?.map((list, index) => (
                                                 <BoardList

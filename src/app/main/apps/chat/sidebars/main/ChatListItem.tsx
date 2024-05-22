@@ -11,6 +11,8 @@ import UserAvatar from '../../UserAvatar';
 import { ContactType } from '../../types/ContactType';
 import { ChatListItemType } from '../../types/ChatListItemType';
 import React from 'react';
+import ru from 'date-fns/locale/ru';
+import { useMediaQuery } from '@mui/material';
 
 type ExtendedListItemProps = NavLinkAdapterPropsType & {
     component: React.ElementType<NavLinkAdapterPropsType>;
@@ -30,11 +32,12 @@ type ChatListItemProps = {
  * The chat list item.
  */
 function ChatListItem(props: ChatListItemProps) {
+    const isMobile = useMediaQuery('(max-width: 600px)');
     const { item } = props;
     return (
         <StyledListItem
             component={NavLinkAdapter}
-            className="px-32 py-12 min-h-80"
+            className={`px-32 py-12 min-h-80 ${isMobile ? 'w-screen' : 'w-full'}`}
             to={`/apps/chat/${item.chat_id}`}
             end
             activeClassName="active"
@@ -43,7 +46,7 @@ function ChatListItem(props: ChatListItemProps) {
 
             <ListItemText
                 classes={{
-                    root: 'min-w-px px-16',
+                    root: `min-w-px px-16  `,
                     primary: 'font-medium text-14',
                     secondary: 'truncate',
                 }}
@@ -58,7 +61,7 @@ function ChatListItem(props: ChatListItemProps) {
                             className="whitespace-nowrap mb-8 font-medium text-12"
                             color="text.secondary"
                         >
-                            {format(new Date(item.lastMessageAt), 'PP')}
+                            {format(new Date(item.lastMessageAt), 'PP', { locale: ru })}
                         </Typography>
                     )}
                     <div className="items-center">

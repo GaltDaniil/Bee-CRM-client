@@ -1,6 +1,7 @@
 import { ChecklistType } from './ChecklistType';
 import { CommentsType } from './CommentType';
 import { AttachmentType } from './AttachmentType';
+import { ContactType } from '../../contacts/types/ContactType';
 
 export type LabelId = string;
 
@@ -24,14 +25,15 @@ export type CardType = {
     memberIds: MemberId[];
     attachments: AttachmentType[];
     card_subscribed: boolean;
-    card_checklists: ChecklistType[];
+    card_checklists: CommentsType;
+    card_deal_files: string[];
 
     card_deal_num: string;
     card_deal_price: number;
     card_deal_left_cost: string;
     card_deal_payed_money: string;
     card_deal_status: string;
-
+    left_cost_money;
     card_deal_pay_url: string;
     card_deal_url: string;
     card_client_url: string;
@@ -44,6 +46,8 @@ export type CardType = {
     card_deal_created: string;
     card_deal_payed: string;
     createdAt: Date;
+    contact: ContactType;
+    activities: CommentsType;
 };
 
 /**

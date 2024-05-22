@@ -4,7 +4,7 @@ import moment from 'moment'; //'../../../styles/moment-ru';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { Moment } from 'moment/moment';
 
-import '../../../styles/moment-ru';
+import '../../../app/moment-ru';
 
 type FuseCountdownProps = {
     onComplete?: () => void;

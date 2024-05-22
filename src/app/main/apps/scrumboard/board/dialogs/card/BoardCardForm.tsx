@@ -1,5 +1,7 @@
 import { useDebounce } from '@fuse/hooks';
+import { useState } from 'react';
 import _ from '@lodash';
+import { motion } from 'framer-motion';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import clsx from 'clsx';
 import Avatar from '@mui/material/Avatar';
@@ -39,11 +41,12 @@ import { LabelType, LabelsType } from '../../../types/LabelType';
 import { MemberType, MembersType } from '../../../types/MemberType';
 import { ChecklistsType } from '../../../types/ChecklistType';
 import { CommentsType } from '../../../types/CommentType';
-import { selectContact } from 'src/app/main/apps/contacts/store/contactSlice';
+import { getContact, selectContact } from 'src/app/main/apps/contacts/store/contactSlice';
 import { ContactType } from 'src/app/main/apps/contacts/types/ContactType';
 import { selectUsers } from 'app/store/user/userListSlice';
 import UserType from 'app/store/user/UserType';
 import { UserListType } from 'app/store/user/UserListType';
+import { Card } from '@mui/material';
 
 /**
  * The board card form component.
@@ -55,7 +58,6 @@ function BoardCardForm() {
     const members = useAppSelector(selectMembers);
     const users = useAppSelector(selectUsers);
     const card = useAppSelector(selectCardData) as CardType;
-    const contact = useAppSelector(selectContact);
     const list = useAppSelector(selectListById(card?.list_id));
 
     const { register, watch, control, setValue } = useForm<CardType>({
@@ -64,16 +66,29 @@ function BoardCardForm() {
     });
     const cardForm = watch();
 
+    const [isFiles, setFiles] = useState(null);
+    const [isCalling, setIsCalling] = useState(false);
+    const [isCopyUser, setIsCopyUser] = useState(false);
+    const [isCopyDeal, setIsCopyDeal] = useState(false);
+    const [isCopyPay, setIsCopyPay] = useState(false);
+
     const updateCardData = useDebounce((newCard: CardType) => {
         dispatch(updateCard(newCard));
     }, 600);
-
     useEffect(() => {
+        console.log('запустился useEffect на фронте');
         if (!card) {
             return;
         }
+        console.log('card', card);
+        console.log('cardForm', cardForm);
+
         if (!_.isEqual(card, cardForm)) {
+            console.log('запустился updateCardData(cardForm)');
             updateCardData(cardForm);
+        }
+        if (isFiles) {
+            handleUpload(isFiles);
         }
     }, [card, cardForm, updateCardData]);
 
@@ -81,7 +96,7 @@ function BoardCardForm() {
         register('card_attachmentCoverId');
     }, [register]);
 
-    if (!card && !board && !contact) {
+    if (!card && !board) {
         return null;
     }
 
@@ -99,8 +114,83 @@ function BoardCardForm() {
         }
     };
 
-    const deleteCardButton = () => {
-        dispatch(removeCard());
+    const callbackHandler = async () => {
+        console.log('Пошел звонок');
+        setIsCalling(true);
+        await fetch(
+            `https://beechat.ru/api/integration/novofon/callback?from=${100}&to=${
+                card.contact.contact_phone
+            }&sip=${100}`,
+            {
+                method: 'GET',
+            },
+        );
+        setIsCalling(false);
+    };
+
+    const handleFileChange = (e) => {
+        console.log('запустился handleFileChange');
+        const selectedFile = e.target.files;
+        setFiles(selectedFile);
+    };
+
+    const handleUpload = async (uploadFile) => {
+        console.log('запустился handleUpload');
+        // Здесь вы можете написать логику для загрузки файла на сервер
+        if (uploadFile && cardForm.attachments.length < 1) {
+            console.log(uploadFile);
+            const formData = new FormData();
+            formData.append('file', uploadFile[0]);
+            console.log('Сформированная formData', formData);
+            try {
+                const response = await fetch(
+                    `https://beechat.ru/api/scrumboard/boards/${card.board_id}/cards/${card.card_id}/attachments/add`,
+                    {
+                        method: 'POST',
+                        body: formData,
+                        /* headers: {
+                            'Content-Type': 'multipart/form-data; charset=windows-1251', // Устанавливаем заголовок с кодировкой
+                        }, */
+                    },
+                );
+                const data = await response.json();
+                console.log('File uploaded:', data);
+            } catch (error) {
+                console.error('Error uploading file:', error);
+            }
+        }
+    };
+
+    const handleDeleteAttachment = async (attachment_id) => {
+        const response = await fetch(
+            `https://beechat.ru/api/scrumboard/boards/${card.board_id}/cards/${card.card_id}/attachments/delete/${attachment_id}`,
+            {
+                method: 'DELETE',
+            },
+        );
+        setValue(
+            'attachments',
+            _.reject(cardForm.attachments, {
+                attachment_id: attachment_id,
+            }),
+        );
+    };
+
+    const copyButton = (type, text) => {
+        navigator.clipboard.writeText(text);
+        if (type === 'user') {
+            setIsCopyUser(true);
+            setIsCopyDeal(false);
+            setIsCopyPay(false);
+        } else if (type === 'deal') {
+            setIsCopyUser(false);
+            setIsCopyDeal(true);
+            setIsCopyPay(false);
+        } else if (type === 'pay') {
+            setIsCopyUser(false);
+            setIsCopyDeal(false);
+            setIsCopyPay(true);
+        }
     };
 
     return (
@@ -162,24 +252,8 @@ function BoardCardForm() {
                             />
                         )}
                     />
-                </div>
-
-                <div className="w-full mb-24">
-                    <Controller
-                        name="card_description"
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                label="Description"
-                                multiline
-                                rows="4"
-                                variant="outlined"
-                                fullWidth
-                            />
-                        )}
-                    />
                 </div> */}
+
                 <div className={`w-150 p-10 rounded-lg flex items-center`}>
                     {card ? (
                         <div
@@ -208,50 +282,112 @@ function BoardCardForm() {
                         <FuseSvgIcon className="mr-5" size={20}>
                             heroicons-outline:user
                         </FuseSvgIcon>
-                        {contact ? contact.data.contact_name : null}
+                        {card && card.contact ? card.contact.contact_name : null}
                     </div>
                     <div className="flex items-center mt-12 mb-12">
                         <FuseSvgIcon className="mr-5" size={20}>
                             heroicons-outline:mail
                         </FuseSvgIcon>
-                        {contact ? contact.data.contact_email : null}
+                        {card && card.contact ? card.contact.contact_email : null}
                     </div>
                     <div className="flex items-center mt-12 mb-12">
                         <FuseSvgIcon className="mr-5" size={20}>
                             heroicons-outline:phone
                         </FuseSvgIcon>
-                        {contact ? contact.data.contact_phone : null}
+                        {card && card.contact ? card.contact.contact_phone : null}
+                        {isCalling ? (
+                            <FuseSvgIcon
+                                className="ml-10 bg-grey p-2 rounded-4 text-white"
+                                size={20}
+                            >
+                                heroicons-outline:phone
+                            </FuseSvgIcon>
+                        ) : (
+                            <FuseSvgIcon
+                                onClick={() => callbackHandler()}
+                                className="ml-10 bg-green p-2 rounded-4 text-white"
+                                size={20}
+                            >
+                                heroicons-outline:phone
+                            </FuseSvgIcon>
+                        )}
                     </div>
-                    <div className="flex items-center mt-16 mb-12">
-                        <FuseSvgIcon className="mr-5" size={20}>
-                            heroicons-outline:link
-                        </FuseSvgIcon>
-                        {card ? (
+                    {card && card.card_client_url ? (
+                        <div className="flex items-center mt-16 mb-12">
+                            <FuseSvgIcon className="mr-5" size={20}>
+                                heroicons-outline:link
+                            </FuseSvgIcon>
                             <a href={card.card_client_url} target="_blank">
                                 Ссылка на пользователя
                             </a>
-                        ) : null}
-                    </div>
-                    <div className="flex items-center mt-16 mb-12">
-                        <FuseSvgIcon className="mr-5" size={20}>
-                            heroicons-outline:link
-                        </FuseSvgIcon>
-                        {card ? (
+
+                            <FuseSvgIcon
+                                onClick={() => copyButton('user', card.card_client_url)}
+                                className={`ml-10 ${
+                                    !isCopyUser ? 'bg-blue' : 'bg-grey'
+                                } p-3 rounded-4 text-white`}
+                                size={24}
+                            >
+                                heroicons-outline:document-duplicate
+                            </FuseSvgIcon>
+                        </div>
+                    ) : null}
+                    {card && card.card_deal_url ? (
+                        <div className="flex items-center mt-16 mb-12">
+                            <FuseSvgIcon className="mr-5" size={20}>
+                                heroicons-outline:link
+                            </FuseSvgIcon>
                             <a href={card.card_deal_url} target="_blank">
                                 Ссылка на заказ
                             </a>
-                        ) : null}
-                    </div>
-                    <div className="flex items-center mt-16 mb-12">
-                        <FuseSvgIcon className="mr-5" size={20}>
-                            heroicons-outline:link
-                        </FuseSvgIcon>
-                        {card ? (
+
+                            <FuseSvgIcon
+                                onClick={() => copyButton('deal', card.card_deal_url)}
+                                className={`ml-10 ${
+                                    !isCopyDeal ? 'bg-blue' : 'bg-grey'
+                                } p-3 rounded-4 text-white`}
+                                size={24}
+                            >
+                                heroicons-outline:document-duplicate
+                            </FuseSvgIcon>
+                        </div>
+                    ) : null}
+                    {card && card.card_deal_pay_url ? (
+                        <div className="flex items-center mb-32 mt-16 ">
+                            <FuseSvgIcon className="mr-5" size={20}>
+                                heroicons-outline:link
+                            </FuseSvgIcon>
                             <a href={card.card_deal_pay_url} target="_blank">
                                 Ссылка на оплату
                             </a>
-                        ) : null}
-                    </div>
+                            <FuseSvgIcon
+                                onClick={() => copyButton('pay', card.card_deal_pay_url)}
+                                className={`ml-10 ${
+                                    !isCopyPay ? 'bg-blue' : 'bg-grey'
+                                } p-3 rounded-4 text-white`}
+                                size={24}
+                            >
+                                heroicons-outline:document-duplicate
+                            </FuseSvgIcon>
+                        </div>
+                    ) : null}
+
+                    {/* <div className="w-full mb-20 mt-14">
+                        <Controller
+                            name="card_deal_description"
+                            control={control}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    label="Заметки"
+                                    multiline
+                                    rows="4"
+                                    variant="outlined"
+                                    fullWidth
+                                />
+                            )}
+                        />
+                    </div> */}
 
                     {/* <Autocomplete
                             className="mt-8 mb-16"
@@ -303,10 +439,6 @@ function BoardCardForm() {
                                 />
                             )}
                         /> */}
-                </div>
-
-                <div className="flex-1 mb-0 mx-8 ">
-                    <div className="opacity-60">Менеджер</div>
                 </div>
 
                 {cardForm.memberIds && cardForm.memberIds.length > 0 && (
@@ -373,7 +505,7 @@ function BoardCardForm() {
                     </div>
                 )}
 
-                {/* {cardForm.attachments && cardForm.attachments.length > 0 && (
+                {cardForm.attachments && cardForm.attachments.length > 0 && (
                     <div className="mb-24">
                         <div className="flex items-center mt-16 mb-12">
                             <FuseSvgIcon size={20}>heroicons-outline:paper-clip</FuseSvgIcon>
@@ -386,24 +518,27 @@ function BoardCardForm() {
                                 <CardAttachment
                                     item={item}
                                     card={cardForm}
-                                    makeCover={() => {
-                                        setValue('card_attachmentCoverId', item.id);
+                                    /* makeCover={() => {
+                                        setValue('attachmentCoverId', item.attachment_id);
                                     }}
                                     removeCover={() => {
-                                        setValue('card_attachmentCoverId', '');
-                                    }}
+                                        setValue('attachmentCoverId', '');
+                                    }} */
                                     removeAttachment={() => {
-                                        setValue(
+                                        handleDeleteAttachment(item.attachment_id);
+                                        /* setValue(
                                             'attachments',
-                                            _.reject(cardForm.attachments, { id: item.id }),
-                                        );
+                                            _.reject(cardForm.attachments, {
+                                                attachment_id: item.attachment_id,
+                                            }),
+                                        ); */
                                     }}
-                                    key={item.id}
+                                    key={item.attachment_id}
                                 />
                             ))}
                         </div>
                     </div>
-                )} */}
+                )}
 
                 {/* {cardForm.card_checklists &&
                     cardForm.card_checklists.map((checklist, index) => (
@@ -430,25 +565,30 @@ function BoardCardForm() {
                         />
                     ))} */}
 
-                {/* <div className="mb-24">
-                    <div className="flex items-center mt-16 mb-12">
-                        <FuseSvgIcon size={20}>heroicons-outline:chat-alt</FuseSvgIcon>
-                        <Typography className="font-semibold text-16 mx-8">Comment</Typography>
+                {card ? (
+                    <div className="mb-24">
+                        <div className="flex items-center mt-16 mb-12">
+                            <FuseSvgIcon size={20}>heroicons-outline:chat-alt</FuseSvgIcon>
+                            <Typography className="font-semibold text-16 mx-8">
+                                Комментарии
+                            </Typography>
+                        </div>
+                        <div>
+                            <CardComment
+                                onCommentAdd={(comment) =>
+                                    setValue('card_checklists', [
+                                        comment,
+                                        ...cardForm.card_checklists,
+                                    ] as CommentsType)
+                                }
+                                card_id={card.card_id}
+                            />
+                        </div>
                     </div>
-                    <div>
-                        <CardComment
-                            onCommentAdd={(comment) =>
-                                setValue('card_activities', [
-                                    comment,
-                                    ...cardForm.card_activities,
-                                ] as CommentsType)
-                            }
-                        />
-                    </div>
-                </div> */}
+                ) : null}
 
-                {/* <Controller
-                    name="card_activities"
+                <Controller
+                    name="card_checklists"
                     control={control}
                     defaultValue={[]}
                     render={({ field: { value } }) => (
@@ -464,15 +604,15 @@ function BoardCardForm() {
                                         </Typography>
                                     </div>
                                     <List>
-                                        {value.map((item) => (
-                                            <CardActivity item={item} key={item.id} />
+                                        {value.map((item, index) => (
+                                            <CardActivity item={item} key={index} />
                                         ))}
                                     </List>
                                 </div>
                             )}
                         </div>
                     )}
-                /> */}
+                />
             </div>
 
             <div className="flex order-first sm:order-last items-start sticky top-0">
@@ -527,29 +667,32 @@ function BoardCardForm() {
                             )}
                         />
 
-                        {/* <Controller
+                        <Controller
                             name="attachments"
                             control={control}
                             defaultValue={[]}
-                            render={() => (
-                                <IconButton size="large">
-                                    <FuseSvgIcon>heroicons-outline:paper-clip</FuseSvgIcon>
-                                </IconButton>
+                            render={({ field: { onChange, value } }) => (
+                                <div>
+                                    <input
+                                        type="file"
+                                        id="fileInput"
+                                        accept="image/*"
+                                        style={{ display: 'none' }}
+                                        onChange={(e) => {
+                                            handleFileChange(e);
+                                            //onChange(e.target.files);
+                                        }}
+                                    />
+                                    <IconButton
+                                        size="large"
+                                        onClick={() => document.getElementById('fileInput').click()}
+                                    >
+                                        <FuseSvgIcon>heroicons-outline:paper-clip</FuseSvgIcon>
+                                    </IconButton>
+                                    <button onClick={handleUpload}></button>
+                                </div>
                             )}
-                        /> */}
-
-                        {/* <Controller
-                            name="card_checklists"
-                            control={control}
-                            defaultValue={[]}
-                            render={({ field: { onChange } }) => (
-                                <CheckListMenu
-                                    onAddCheckList={(newList) =>
-                                        onChange([...cardForm.card_checklists, newList])
-                                    }
-                                />
-                            )}
-                        /> */}
+                        />
 
                         <OptionsMenu onRemoveCard={() => dispatch(removeCard())} />
                     </div>
@@ -558,5 +701,4 @@ function BoardCardForm() {
         </DialogContent>
     );
 }
-
 export default BoardCardForm;

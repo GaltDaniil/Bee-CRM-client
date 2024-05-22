@@ -8,7 +8,7 @@ import Paper from '@mui/material/Paper';
 import socket from '../../socket';
 import axios from 'axios';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import { Box, IconButton, Toolbar } from '@mui/material';
+import { Box, IconButton, Toolbar, Button } from '@mui/material';
 import UserAvatar from '../apps/chat/UserAvatar';
 import { useAppDispatch, useAppSelector } from 'app/store';
 import { formatDistanceToNow } from 'date-fns';
@@ -98,10 +98,42 @@ export const BeeChatPage: React.FC = (props) => {
     const [message_value, setMessageValue] = useState('');
 
     const [isChatOpen, setIsChatOpen] = useState(false);
-    const [messages, setMessages] = useState<ChatMessageType[]>([]);
+    const [messages, setMessages] = useState<ChatMessageType[]>([
+        {
+            message_id: 'string',
+            chat_id: 'string',
+            contact_id: 'string',
+            manager_id: 'string',
+            message_value: 'string',
+            message_type: 'chatBot',
+            is_readed: true,
+            //@ts-ignore
+            createdAt: new Date(),
+            attachments: [],
+        },
+        {
+            message_id: 'string',
+            chat_id: 'string',
+            contact_id: 'string',
+            manager_id: '',
+            message_value: ' gf wekgj wkefjwek fjwelkf jwekfjwlkefjwlkef jwlkef jwelk fj',
+            message_type: 'string',
+            is_readed: true,
+            //@ts-ignore
+            createdAt: new Date(),
+            attachments: [],
+        },
+    ]);
     const [chat_id, setChatId] = useState<string>('');
-    const [account_id, setAccountId] = useState<string>('ecfafe4bc756935e17d93bec');
     const [fromUrl, setFromUrl] = useState('');
+    const [predefinedReplies, setPredefinedReplies] = useState<string[]>([
+        'Кнопка 1',
+        'Кнопка кнопка 2',
+        'Омикткикеи',
+        // Другие заготовленные ответы
+    ]);
+
+    const [showButtons, setShowButtons] = useState<boolean>(true);
 
     useEffect(() => {
         socket.on('newMessage', (data) => {
@@ -170,6 +202,18 @@ export const BeeChatPage: React.FC = (props) => {
         setMessageValue(ev.target.value);
     }
 
+    const handleButtonClick = (reply: string) => {
+        // Отправить выбранный ответ в чат
+        sendMessageToChat(reply);
+
+        // Скрыть кнопки
+        setShowButtons(false);
+    };
+
+    const sendMessageToChat = (message: string) => {
+        setMessages((prevMessages) => [...prevMessages]);
+    };
+
     /* const onMessageSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
         ev.preventDefault();
         if (message_value === '') {
@@ -177,8 +221,7 @@ export const BeeChatPage: React.FC = (props) => {
         }
 
         if (!chat_id) {
-            const newContact = await axios.post('/contacts', {
-                account_id,
+            const newChat = await axios.post('/contacts', {
                 messenger_id: 0,
                 from_url: fromUrl,
                 messenger_type: 'beechat',
@@ -268,71 +311,79 @@ export const BeeChatPage: React.FC = (props) => {
             </Box>
 
             <div className="flex flex-auto h-full min-h-0 w-full">
-                {chat_id ? (
-                    <div className={'flex flex-1 z-10 flex-col relative flex flex-1 z-10'}>
-                        <div ref={chatRef} className="flex flex-1 flex-col overflow-y-auto">
-                            {messages?.length > 0 && (
-                                <div className="flex flex-col pt-16 px-16 pb-40">
-                                    {messages.map((item, i) => {
-                                        return (
-                                            <StyledMessageRow
-                                                key={i}
-                                                className={clsx(
-                                                    'flex flex-col grow-0 shrink-0 items-start justify-end relative px-16 pb-4',
-                                                    item.manager_id ? 'me' : 'contact',
-                                                    {
-                                                        'first-of-group': isFirstMessageOfGroup(
-                                                            item,
-                                                            i,
-                                                        ),
-                                                    },
-                                                    {
-                                                        'last-of-group': isLastMessageOfGroup(
-                                                            item,
-                                                            i,
-                                                        ),
-                                                    },
-                                                    i + 1 === messages.length && 'pb-96',
-                                                )}
-                                            >
-                                                <div className="bubble flex relative items-center justify-center p-12 max-w-full">
-                                                    <div className="leading-tight whitespace-pre-wrap">
-                                                        {item.message_value}
-                                                    </div>
-
-                                                    <Typography
-                                                        className="time absolute hidden w-full text-11 mt-8 -mb-24 ltr:left-0 rtl:right-0 bottom-0 whitespace-nowrap"
-                                                        color="text.secondary"
-                                                    >
-                                                        {formatDistanceToNow(
-                                                            new Date(item.createdAt),
-                                                            {
-                                                                addSuffix: true,
-                                                            },
-                                                        )}
-                                                    </Typography>
+                <div className={'flex flex-1 z-10 flex-col relative flex flex-1 z-10'}>
+                    <div ref={chatRef} className="flex flex-1 flex-col overflow-y-auto justify-end">
+                        {messages?.length > 0 && (
+                            <div className="flex flex-col pt-16 px-16 pb-40">
+                                {messages.map((item, i) => {
+                                    return (
+                                        <StyledMessageRow
+                                            key={i}
+                                            className={clsx(
+                                                'flex flex-col grow-0 shrink-0 items-start justify-end relative px-16 pb-4',
+                                                item.manager_id ? 'me' : 'contact',
+                                                {
+                                                    'first-of-group': isFirstMessageOfGroup(
+                                                        item,
+                                                        i,
+                                                    ),
+                                                },
+                                                {
+                                                    'last-of-group': isLastMessageOfGroup(item, i),
+                                                },
+                                                i + 1 === messages.length && 'pb-96',
+                                            )}
+                                        >
+                                            <div className="bubble flex relative items-center justify-center p-12 max-w-full">
+                                                <div className="leading-tight whitespace-pre-wrap">
+                                                    {item.message_value}
                                                 </div>
-                                            </StyledMessageRow>
-                                        );
-                                    })}
-                                </div>
-                            )}
-                        </div>
-                        {messages && (
-                            <Paper
-                                square
-                                component="form"
-                                //onSubmit={onMessageSubmit}
-                                className="absolute border-t-1 bottom-0 right-0 left-0 py-16 px-16"
-                                sx={{
-                                    backgroundColor: (theme) =>
-                                        theme.palette.mode === 'light'
-                                            ? lighten(theme.palette.background.default, 0.4)
-                                            : lighten(theme.palette.background.default, 0.02),
-                                }}
-                            >
-                                <div className="flex items-center relative">
-                                    {/* <IconButton type="submit" size="large">
+
+                                                <Typography
+                                                    className="time absolute hidden w-full text-11 mt-8 -mb-24 ltr:left-0 rtl:right-0 bottom-0 whitespace-nowrap"
+                                                    color="text.secondary"
+                                                >
+                                                    {formatDistanceToNow(new Date(item.createdAt), {
+                                                        addSuffix: true,
+                                                    })}
+                                                </Typography>
+                                            </div>
+                                            {item.message_type === 'chatBot' && (
+                                                <div className="flex w-full justify-end ml-auto flex-wrap">
+                                                    {predefinedReplies.map((reply, index) => (
+                                                        <Button
+                                                            className="m-4"
+                                                            variant="contained"
+                                                            size="small"
+                                                            key={index}
+                                                            onClick={() => handleButtonClick(reply)}
+                                                        >
+                                                            {reply}
+                                                        </Button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </StyledMessageRow>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                    {messages && (
+                        <Paper
+                            square
+                            component="form"
+                            //onSubmit={onMessageSubmit}
+                            className="absolute border-t-1 bottom-0 right-0 left-0 py-16 px-16"
+                            sx={{
+                                backgroundColor: (theme) =>
+                                    theme.palette.mode === 'light'
+                                        ? lighten(theme.palette.background.default, 0.4)
+                                        : lighten(theme.palette.background.default, 0.02),
+                            }}
+                        >
+                            <div className="flex items-center relative">
+                                {/* <IconButton type="submit" size="large">
                                     <FuseSvgIcon className="text-24" color="action">
                                         heroicons-outline:emoji-happy
                                     </FuseSvgIcon>
@@ -344,46 +395,24 @@ export const BeeChatPage: React.FC = (props) => {
                                     </FuseSvgIcon>
                                 </IconButton> */}
 
-                                    <InputBase
-                                        autoFocus={false}
-                                        id="message-input"
-                                        className="flex-1 flex grow shrink-0 h-44 mx-8 px-16 border-2 rounded-full"
-                                        placeholder="Какой вопрос вас интересует?"
-                                        onChange={onInputChange}
-                                        value={message_value}
-                                        sx={{ backgroundColor: 'background.paper' }}
-                                    />
-                                    <IconButton type="submit" size="large">
-                                        <FuseSvgIcon className="rotate-90" color="action">
-                                            heroicons-outline:paper-airplane
-                                        </FuseSvgIcon>
-                                    </IconButton>
-                                </div>
-                            </Paper>
-                        )}
-                    </div>
-                ) : (
-                    <div className="flex flex-col h-200 w-full">
-                        <InputBase
-                            autoFocus={false}
-                            id="name-input"
-                            className="flex-1 flex grow shrink-0 h-44 mx-8 px-16 border-2 rounded-full"
-                            placeholder="Как к вам обращаться?"
-                            onChange={onInputChange}
-                            value={message_value}
-                            sx={{ backgroundColor: 'background.paper' }}
-                        />
-                        <InputBase
-                            autoFocus={false}
-                            id="phone-input"
-                            className="flex-1 flex grow shrink-0 h-44 mx-8 px-16 border-2 rounded-full"
-                            placeholder="Ваш номер телефона?"
-                            onChange={onInputChange}
-                            value={message_value}
-                            sx={{ backgroundColor: 'background.paper' }}
-                        />
-                    </div>
-                )}
+                                <InputBase
+                                    autoFocus={false}
+                                    id="message-input"
+                                    className="flex-1 flex grow shrink-0 h-44 mx-8 px-16 border-2 rounded-full"
+                                    placeholder="Какой вопрос вас интересует?"
+                                    onChange={onInputChange}
+                                    value={message_value}
+                                    sx={{ backgroundColor: 'background.paper' }}
+                                />
+                                <IconButton type="submit" size="large">
+                                    <FuseSvgIcon className="rotate-90" color="action">
+                                        heroicons-outline:paper-airplane
+                                    </FuseSvgIcon>
+                                </IconButton>
+                            </div>
+                        </Paper>
+                    )}
+                </div>
             </div>
         </div>
     );

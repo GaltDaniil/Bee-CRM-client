@@ -5,14 +5,14 @@ import List from '@mui/material/List';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { motion } from 'framer-motion';
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import Box from '@mui/material/Box';
 import { lighten } from '@mui/material/styles';
 import { useAppDispatch, useAppSelector } from 'app/store';
 //import ContactListItem from './ContactListItem';
-import { getChatList, selectChats } from '../../store/chatListSlice';
+import { getChatList, getChatListPart, selectChats } from '../../store/chatListSlice';
 import UserAvatar from '../../UserAvatar';
 import MainSidebarMoreMenu from './MainSidebarMoreMenu';
 import { ChatAppContext } from '../../ChatApp';
@@ -31,20 +31,34 @@ function MainSidebar() {
     //const contacts = useAppSelector(selectContacts);
     const chats = useAppSelector(selectChats);
     const { data: user } = useAppSelector(selectUser);
-    console.log(chats);
 
     const [searchText, setSearchText] = useState('');
+
+    // Функционал бесконечной загрузки
+    const [isLoading, setIsLoading] = useState(false);
+    const [limit, setLimit] = useState(20);
 
     function handleSearchText(event: React.ChangeEvent<HTMLInputElement>) {
         setSearchText(event.target.value);
     }
 
+    function loadingMoreChats() {
+        console.log('limit', limit);
+        const newLimit = limit + 20;
+        dispatch(getChatListPart(newLimit));
+        setLimit(newLimit);
+    }
+
     React.useEffect(() => {
         socket.on('update', () => {
-            dispatch(getChatList());
+            dispatch(getChatListPart(limit));
             console.log('update');
         });
     }, []);
+
+    React.useEffect(() => {
+        dispatch(getChatListPart(limit));
+    }, [dispatch]);
 
     return (
         <div className="flex flex-col flex-auto h-full">
@@ -199,6 +213,14 @@ function MainSidebar() {
                                         </div>
                                     </motion.div>
                                 ))} */}
+                                {chats && filteredChatList ? (
+                                    <div
+                                        onClick={() => loadingMoreChats()}
+                                        className="flex items-center justify-center h-60"
+                                    >
+                                        Ещё
+                                    </div>
+                                ) : null}
                             </motion.div>
                         );
                     }, [chats, searchText, dispatch])}

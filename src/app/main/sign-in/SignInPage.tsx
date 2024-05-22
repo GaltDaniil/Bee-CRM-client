@@ -96,6 +96,7 @@ function SignInPage() {
                             Sign up
                         </Link>
                     </div>
+                    <div>lia@linnik-fitness1.ru</div>
 
                     <form
                         name="loginForm"

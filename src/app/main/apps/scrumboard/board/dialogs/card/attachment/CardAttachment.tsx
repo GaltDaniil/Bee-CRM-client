@@ -13,8 +13,8 @@ import { CardType } from '../../../../types/CardType';
 type CardAttachmentProps = {
     item: AttachmentType;
     card: CardType;
-    makeCover: (id: string) => void;
-    removeCover: () => void;
+    /* makeCover: (id: string) => void;
+    removeCover: () => void; */
     removeAttachment: (id: string) => void;
 };
 
@@ -22,9 +22,11 @@ type CardAttachmentProps = {
  * The card attachment component.
  */
 function CardAttachment(props: CardAttachmentProps) {
-    const { item, card, makeCover, removeCover, removeAttachment } = props;
+    const { item, card, removeAttachment } = props;
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const dateObject = new Date(item.createdAt);
+    const time = Math.floor(dateObject.getTime() / 1000);
 
     function handleMenuOpen(event: MouseEvent<HTMLButtonElement>) {
         setAnchorEl(event.currentTarget);
@@ -34,28 +36,35 @@ function CardAttachment(props: CardAttachmentProps) {
         setAnchorEl(null);
     }
 
-    switch (item.type) {
+    switch (item.attachment_type) {
         case 'image': {
             return (
-                <div className="flex w-full sm:w-1/2 mb-16 px-16" key={item.id}>
+                <div className="flex w-full sm:w-1/2 mb-16 px-16" key={item.attachment_id}>
                     <div className="flex items-center justify-center min-w-128 w-128 h-128">
                         <Paper className="overflow-hidden shadow">
-                            <img className="block max-h-full" src={item.src} alt="attachment" />
+                            <img
+                                className="block max-h-full"
+                                src={item.attachment_src}
+                                alt="attachment"
+                            />
                         </Paper>
                     </div>
                     <div className="flex flex-auto flex-col justify-center items-start min-w-0 px-16">
-                        <div className="flex items-center w-full">
+                        <div className="flex items-center max-w-120">
                             <Typography className="text-16 font-semibold truncate shrink">
-                                {item.name}
+                                {item.attachment_name}
                             </Typography>
-                            {card.card_attachmentCoverId === item.id && (
-                                <FuseSvgIcon className="text-orange-300 mx-4" size={20}>
-                                    heroicons-outline:start
-                                </FuseSvgIcon>
-                            )}
+                            {/* {card.attachmentCoverId === item.id && (
+								<FuseSvgIcon
+									className="text-orange-300 mx-4"
+									size={20}
+								>
+									heroicons-outline:start
+								</FuseSvgIcon>
+							)} */}
                         </div>
                         <Typography className="truncate w-full mb-12" color="text.secondary">
-                            {format(fromUnixTime(item.time), 'Pp')}
+                            {format(fromUnixTime(time), 'Pp')}
                         </Typography>
                         <Button
                             aria-haspopup="true"
@@ -66,7 +75,7 @@ function CardAttachment(props: CardAttachmentProps) {
                                 <FuseSvgIcon size={16}>heroicons-outline:chevron-down</FuseSvgIcon>
                             }
                         >
-                            Actions
+                            Действия
                         </Button>
                         <Menu
                             id="actions-menu"
@@ -74,32 +83,32 @@ function CardAttachment(props: CardAttachmentProps) {
                             open={Boolean(anchorEl)}
                             onClose={handleMenuClose}
                         >
-                            {card.card_attachmentCoverId !== item?.id ? (
-                                <MenuItem
-                                    onClick={() => {
-                                        handleMenuClose();
-                                        makeCover(item?.id);
-                                    }}
-                                >
-                                    Make Cover
-                                </MenuItem>
-                            ) : (
-                                <MenuItem
-                                    onClick={() => {
-                                        handleMenuClose();
-                                        removeCover();
-                                    }}
-                                >
-                                    Remove Cover
-                                </MenuItem>
-                            )}
+                            {/* {card.attachmentCoverId !== item?.id ? (
+								<MenuItem
+									onClick={() => {
+										handleMenuClose();
+										makeCover(item?.id);
+									}}
+								>
+									Make Cover
+								</MenuItem>
+							) : (
+								<MenuItem
+									onClick={() => {
+										handleMenuClose();
+										removeCover();
+									}}
+								>
+									Remove Cover
+								</MenuItem>
+							)} */}
                             <MenuItem
                                 onClick={() => {
                                     handleMenuClose();
-                                    removeAttachment(item.id);
+                                    removeAttachment(item.attachment_id);
                                 }}
                             >
-                                Remove Attachment
+                                Удалить файл
                             </MenuItem>
                         </Menu>
                     </div>
@@ -108,16 +117,16 @@ function CardAttachment(props: CardAttachmentProps) {
         }
         case 'link': {
             return (
-                <div className="flex w-full sm:w-1/2 mb-16 px-16" key={item.id}>
+                <div className="flex w-full sm:w-1/2 mb-16 px-16" key={item.attachment_id}>
                     <Paper className="min-w-128 w-128 h-128 flex items-center justify-center rounded-4 overflow-hidden shadow">
                         <Typography className="font-semibold">LINK</Typography>
                     </Paper>
                     <div className="flex flex-auto flex-col justify-center items-start min-w-0 px-16">
                         <Typography className="text-16 font-semibold truncate w-full">
-                            {item.url}
+                            {item.attachment_url}
                         </Typography>
                         <Typography className="truncate w-full mb-12" color="text.secondary">
-                            {item.time}
+                            {time}
                         </Typography>
                         <Button
                             aria-haspopup="true"
@@ -128,7 +137,7 @@ function CardAttachment(props: CardAttachmentProps) {
                                 <FuseSvgIcon size={16}>heroicons-outline:chevron-down</FuseSvgIcon>
                             }
                         >
-                            Actions
+                            Действия
                         </Button>
                         <Menu
                             id="simple-menu"
@@ -139,10 +148,10 @@ function CardAttachment(props: CardAttachmentProps) {
                             <MenuItem
                                 onClick={() => {
                                     handleMenuClose();
-                                    removeAttachment(item.id);
+                                    removeAttachment(item.attachment_id);
                                 }}
                             >
-                                Remove Attachment
+                                Удалить файл
                             </MenuItem>
                         </Menu>
                     </div>

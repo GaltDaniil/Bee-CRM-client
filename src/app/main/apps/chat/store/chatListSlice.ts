@@ -19,6 +19,17 @@ export const getChatList = createAppAsyncThunk<ChatListType>('chatApp/chatList/g
     return data;
 });
 
+export const getChatListPart = createAppAsyncThunk<ChatListType, number>(
+    'chatApp/chatList/getPart',
+    async (limit) => {
+        const response = await axios.get(`/api/chat/part?limit=${limit}`);
+
+        const data = (await response.data) as ChatListType;
+
+        return data;
+    },
+);
+
 export const getChat = createAppAsyncThunk<ChatListItemType, ChatListItemType['chat_id']>(
     'chatApp/chatList/getOne',
     async (chat_id) => {
@@ -77,6 +88,10 @@ export const chatListSlice = createSlice({
         builder.addCase(getChatList.fulfilled, (state, action) =>
             chatsAdapter.setAll(state, action.payload),
         );
+        builder.addCase(getChatListPart.fulfilled, (state, action) =>
+            chatsAdapter.setAll(state, action.payload),
+        );
+
         builder.addCase(readChatMessages.fulfilled, (state, action) => {
             const updatedChat: ChatListItemType = action.payload;
             chatsAdapter.updateOne(state, { id: updatedChat.chat_id, changes: updatedChat });

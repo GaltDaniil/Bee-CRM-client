@@ -99,6 +99,7 @@ export const cardSlice = createSlice({
     initialState,
     reducers: {
         openCardDialog: (state, action) => {
+            console.log('state', state);
             state.dialogOpen = true;
             state.data = action.payload as CardType;
         },

@@ -2,11 +2,11 @@
  * Comment Type
  */
 export type CommentType = {
-	id: string;
-	type: string;
-	idMember: string;
-	message: string;
-	time: number;
+    comment_id: string;
+    comment_type: string;
+    user_id: string;
+    comment_message: string;
+    createdAt: number;
 };
 
 /**

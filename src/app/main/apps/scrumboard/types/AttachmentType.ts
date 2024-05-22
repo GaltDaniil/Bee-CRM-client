@@ -2,10 +2,17 @@
  * Attachment Type
  */
 export type AttachmentType = {
-	id: string;
-	name: string;
-	src: string;
-	time: number;
-	type: string;
-	url?: string;
+    attachment_id: string;
+    attachment_name: string;
+    attachment_src: string;
+    time: number;
+    attachment_type: string;
+    attachment_url?: string;
+    attachment_market?: {
+        price: string;
+        title: string;
+        photo_url: string;
+        description: string;
+    };
+    createdAt: Date;
 };

@@ -85,9 +85,9 @@ export const reorderList = createAppAsyncThunk<BoardType, DropResult>(
         const board = AppState.scrumboardApp.board.data as BoardType;
 
         const ordered = reorder(_.merge([], board.board_lists), source.index, destination?.index);
-
+        console.log('ordered', ordered);
         const response = await axios.put(`/api/scrumboard/boards/${board.board_id}`, {
-            lists: ordered,
+            board_lists: ordered,
         });
 
         const data = (await response.data) as BoardType;
@@ -106,7 +106,6 @@ export const reorderList = createAppAsyncThunk<BoardType, DropResult>(
         return data;
     },
 );
-
 /**
  * Reorder Board Card
  */

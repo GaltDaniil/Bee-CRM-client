@@ -24,6 +24,8 @@ import { getContact } from '../../../contacts/store/contactSlice';
 import { ContactType, ContactsType } from '../../../contacts/types/ContactType';
 import moment from 'moment';
 import { selectUsers } from 'app/store/user/userListSlice';
+import format from 'date-fns/format';
+import ru from 'date-fns/locale/ru';
 
 const StyledCard = styled(Card)(({ theme }) => ({
     '& ': {
@@ -36,6 +38,11 @@ const StyledCard = styled(Card)(({ theme }) => ({
 type BoardCardProps = {
     cardId: string;
     index: number;
+};
+
+const formateTime = (time) => {
+    const dateObject = new Date(time);
+    return Math.floor(dateObject.getTime());
 };
 
 /**
@@ -51,7 +58,7 @@ function BoardCard(props: BoardCardProps) {
     const [date, setDate] = react.useState<string>();
     const users = useAppSelector(selectUsers);
 
-    react.useEffect(() => {
+    /* react.useEffect(() => {
         const fx = async () => {
             if (card) {
                 const contactData = await dispatch(getContact(card.contact_id));
@@ -61,7 +68,7 @@ function BoardCard(props: BoardCardProps) {
             }
         };
         fx();
-    }, [card]);
+    }, [card]); */
     //const commentsCount = getCommentsCount(card);
     /* const cardCoverImage = _.find(card.attachments, { id: card.card_attachmentCoverId }); */
 
@@ -92,14 +99,14 @@ function BoardCard(props: BoardCardProps) {
     function handleCardClick(ev: MouseEvent<HTMLDivElement>, _card: CardType) {
         ev.preventDefault();
 
-        dispatch(openCardDialog(_card));
+        dispatch(openCardDialog({ ..._card }));
     }
 
     /* function getCommentsCount(_card: CardType) {
         return _.sum(_card.card_activities.map((x) => (x.type === 'comment' ? 1 : 0)));
     } */
 
-    if (!board || !contact) {
+    if (!board) {
         return null;
     }
 
@@ -121,38 +128,44 @@ function BoardCard(props: BoardCardProps) {
                         {/* {board.settings.cardCoverImages && cardCoverImage && (
                             <img className="block" src={cardCoverImage.src} alt="card cover" />
                         )} */}
-                        {contact ? (
+                        {card && card.contact ? (
                             <div className="p-16 pb-0 flex">
                                 <FuseSvgIcon className="pr-6" size={20} color="action">
                                     heroicons-outline:user
                                 </FuseSvgIcon>
-                                {contact.contact_name}
+                                {card.contact.contact_name}
                             </div>
                         ) : null}
-                        <div className="p-16 pb-0 pt-4 flex">
-                            {/* {card.card_labels.length > 0 && (
+                        {card ? (
+                            <div className="p-16 pb-0 pt-4 flex">
+                                {/* {card.card_labels.length > 0 && (
                                 <div className="flex flex-wrap mb-8 -mx-4">
                                     {card.card_labels.map((id) => (
                                         <BoardCardLabel id={id} key={id} />
                                     ))}
                                 </div>
                             )} */}
-                            {/* <FuseSvgIcon className="pr-6" size={20} color="action">
+                                {/* <FuseSvgIcon className="pr-6" size={20} color="action">
                                 heroicons-outline:shopping-cart
                             </FuseSvgIcon> */}
-                            <div className={`${statusColor(card.card_deal_status)} w-4 mr-4`}></div>
-                            <Typography className={`${classes.textTwoLines} font-medium mb-2 `}>
-                                {card?.card_deal_title}
-                            </Typography>
+                                <div
+                                    className={`${statusColor(
+                                        card.card_deal_status,
+                                    )} min-w-4 mr-4 rounded-tl-lg rounded-bl-lg`}
+                                ></div>
+                                <Typography className={`${classes.textTwoLines} font-medium mb-2 `}>
+                                    {card?.card_deal_title}
+                                </Typography>
 
-                            {/* {(card.dueDate || card.card_checklists.length > 0) && (
+                                {/* {(card.dueDate || card.card_checklists.length > 0) && (
                                 <div className="flex items-center mb-12 -mx-4">
                                     <BoardCardDueDate dueDate={card.dueDate} />
 
                                     <BoardCardCheckItems card={card} />
                                 </div>
                             )} */}
-                        </div>
+                            </div>
+                        ) : null}
 
                         <div className="flex justify-between h-48 px-16">
                             <div className="flex items-center space-x-4">
@@ -174,7 +187,13 @@ function BoardCard(props: BoardCardProps) {
                                             heroicons-outline:clock
                                         </FuseSvgIcon>
                                         <Typography color="text.secondary">
-                                            {card.createdAt ? date : 0}
+                                            {card.createdAt
+                                                ? format(
+                                                      formateTime(card.createdAt),
+                                                      'dd MMM HH:mm',
+                                                      { locale: ru },
+                                                  )
+                                                : 0}
                                         </Typography>
                                     </span>
                                 ) : null}
@@ -201,32 +220,34 @@ function BoardCard(props: BoardCardProps) {
                                 )} */}
                             </div>
 
-                            <div className="flex items-center justify-end space-x-12">
-                                {card.memberIds.length > 0 && (
-                                    <div className="flex justify-start">
-                                        <AvatarGroup
-                                            max={3}
-                                            classes={{ avatar: 'w-24 h-24 text-12' }}
-                                        >
-                                            {card.memberIds.map((user_id) => {
-                                                const member = _.find(users, { user_id });
-                                                return (
-                                                    <Tooltip
-                                                        title={member?.data.user_name}
-                                                        key={user_id}
-                                                    >
-                                                        <Avatar
-                                                            key={index}
-                                                            alt="member"
-                                                            src={`https://beechat.ru/${member?.data.user_photo_url}`}
-                                                        />
-                                                    </Tooltip>
-                                                );
-                                            })}
-                                        </AvatarGroup>
-                                    </div>
-                                )}
-                            </div>
+                            {card ? (
+                                <div className="flex items-center justify-end space-x-12">
+                                    {card.memberIds.length > 0 && (
+                                        <div className="flex justify-start">
+                                            <AvatarGroup
+                                                max={3}
+                                                classes={{ avatar: 'w-24 h-24 text-12' }}
+                                            >
+                                                {card.memberIds.map((user_id) => {
+                                                    const member = _.find(users, { user_id });
+                                                    return (
+                                                        <Tooltip
+                                                            title={member?.data.user_name}
+                                                            key={user_id}
+                                                        >
+                                                            <Avatar
+                                                                key={index}
+                                                                alt="member"
+                                                                src={`https://beechat.ru/${member?.data.user_photo_url}`}
+                                                            />
+                                                        </Tooltip>
+                                                    );
+                                                })}
+                                            </AvatarGroup>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : null}
                         </div>
                     </StyledCard>
                 </div>

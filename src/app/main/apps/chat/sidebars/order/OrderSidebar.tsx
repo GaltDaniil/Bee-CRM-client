@@ -14,9 +14,9 @@ import { ChatAppContext } from '../../ChatApp';
 import { selectChatById } from '../../store/chatListSlice';
 import { useEffect } from 'react';
 
-function ContactSidebar() {
+function OrderSidebar() {
     const dispatch = useAppDispatch();
-    const { setContactSidebarOpen, setOrderSidebarOpen } = useContext(ChatAppContext);
+    const { setOrderSidebarOpen } = useContext(ChatAppContext);
     const routeParams = useParams();
     const chat_id = routeParams.id;
     const selectedChat = useAppSelector(selectChatById(chat_id));
@@ -45,7 +45,7 @@ function ContactSidebar() {
             >
                 <Toolbar className="flex items-center px-4">
                     <IconButton
-                        onClick={() => setContactSidebarOpen(false)}
+                        onClick={() => setOrderSidebarOpen(false)}
                         color="inherit"
                         size="large"
                     >
@@ -56,12 +56,12 @@ function ContactSidebar() {
                         color="inherit"
                         variant="subtitle1"
                     >
-                        Информация о контакте
+                        Создать заказ
                     </Typography>
                 </Toolbar>
             </Box>
 
-            <div className="flex flex-col justify-center items-center mt-32">
+            {/* <div className="flex flex-col justify-center items-center mt-32">
                 <UserAvatar className="w-160 h-160 text-64" user={contact} />
                 <Typography className="mt-16 text-16 font-medium">
                     {contact.contact_name}
@@ -70,7 +70,7 @@ function ContactSidebar() {
                 <Typography color="text.secondary" className="mt-2 text-13">
                     {contact.contact_about}
                 </Typography>
-            </div>
+            </div> */}
             <div className="w-full p-24">
                 {/* {contact.attachments?.media && (
                     <>
@@ -149,44 +149,9 @@ function ContactSidebar() {
                         </Typography>
                     ) : null}
                 </div>
-
-                {/* <div className="mt-16">
-                    <Typography className="text-14 font-medium" color="text.secondary">
-                        Title
-                    </Typography>
-
-                    <Typography>{contact.details.title}</Typography>
-                </div> */}
-
-                {/* <div className="mt-16">
-                    <Typography className="text-14 font-medium" color="text.secondary">
-                        Company
-                    </Typography>
-
-                    <Typography>{contact.details.company}</Typography>
-                </div> */}
-
-                {/* <div className="mt-16">
-					<Typography
-						className="text-14 font-medium"
-						color="text.secondary"
-					>
-						Birthday
-					</Typography>
-
-					<Typography>{format(new Date(contact.details.birthday), 'P')}</Typography>
-				</div> */}
-
-                {/* <div className="mt-16">
-                    <Typography className="text-14 font-medium" color="text.secondary">
-                        Address
-                    </Typography>
-
-                    <Typography>{contact.details.address}</Typography>
-                </div> */}
             </div>
         </div>
     );
 }
 
-export default ContactSidebar;
+export default OrderSidebar;

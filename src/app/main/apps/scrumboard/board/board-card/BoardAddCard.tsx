@@ -11,6 +11,7 @@ import * as yup from 'yup';
 import _ from '@lodash';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { newCard } from '../../store/cardsSlice';
+import { CardType } from '../../types/CardType';
 
 type FormType = {
     card_title: string;
@@ -63,7 +64,7 @@ function BoardAddCard(props: BoardAddCardProps) {
         setFormOpen(false);
     }
 
-    function onSubmit(newData: FormType) {
+    function onSubmit(newData: CardType) {
         dispatch(newCard({ listId, newData })).then(() => {
             onCardAdded();
         });

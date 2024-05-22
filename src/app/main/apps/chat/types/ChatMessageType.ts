@@ -1,3 +1,5 @@
+import { AttachmentType } from '../../scrumboard/types/AttachmentType';
+
 /**
  * Chat Message Type
  */
@@ -10,6 +12,7 @@ export type ChatMessageType = {
     message_type: string;
     is_readed: boolean;
     createdAt: string;
+    attachments: AttachmentType[];
 };
 
 /**

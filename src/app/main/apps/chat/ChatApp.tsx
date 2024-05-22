@@ -12,21 +12,24 @@ import UserSidebar from './sidebars/user/UserSidebar';
 
 import { getUserData } from './store/userSlice';
 import { getContacts } from './store/contactsSlice';
-import { getChatList } from './store/chatListSlice';
+import { getChatList, getChatListPart } from './store/chatListSlice';
 import { selectUser } from 'app/store/user/userSlice';
 
 import { useAppDispatch, useAppSelector } from 'app/store';
+import OrderSidebar from './sidebars/order/OrderSidebar';
 
 const drawerWidth = 400;
 
 type ChatAppContextType = {
     setMainSidebarOpen: (isOpen?: boolean) => void;
+    setOrderSidebarOpen: (isOpen?: boolean) => void;
     setContactSidebarOpen: (isOpen?: boolean) => void;
     setUserSidebarOpen: (isOpen?: boolean) => void;
 };
 
 export const ChatAppContext = createContext<ChatAppContextType>({
     setMainSidebarOpen: () => {},
+    setOrderSidebarOpen: () => {},
     setContactSidebarOpen: () => {},
     setUserSidebarOpen: () => {},
 });
@@ -57,13 +60,15 @@ function ChatApp() {
     const userData = useAppSelector(selectUser);
     const [mainSidebarOpen, setMainSidebarOpen] = useState(!isMobile);
     const [contactSidebarOpen, setContactSidebarOpen] = useState(false);
+    const [orderSidebarOpen, setOrderSidebarOpen] = useState(false);
     const [userSidebarOpen, setUserSidebarOpen] = useState(false);
+    const [limit, setLimit] = useState(20);
     const location = useLocation();
 
     useEffect(() => {
         dispatch(getUserData(userData.user_id));
-        //dispatch(getContacts());
-        dispatch(getChatList());
+        //изменил тут
+        //dispatch(getChatListPart(limit));
     }, [dispatch]);
 
     useEffect(() => {
@@ -86,9 +91,10 @@ function ChatApp() {
         () => ({
             setMainSidebarOpen,
             setContactSidebarOpen,
+            setOrderSidebarOpen,
             setUserSidebarOpen,
         }),
-        [setMainSidebarOpen, setContactSidebarOpen, setUserSidebarOpen],
+        [setOrderSidebarOpen, setMainSidebarOpen, setContactSidebarOpen, setUserSidebarOpen],
     );
 
     return (
@@ -105,6 +111,11 @@ function ChatApp() {
                 rightSidebarOpen={contactSidebarOpen}
                 rightSidebarOnClose={() => {
                     setContactSidebarOpen(false);
+                }}
+                rightOrderSidebarContent={<OrderSidebar />}
+                rightOrderSidebarOpen={orderSidebarOpen}
+                rightOrderSidebarOnClose={() => {
+                    setOrderSidebarOpen(false);
                 }}
                 rightSidebarWidth={400}
                 scroll="content"
