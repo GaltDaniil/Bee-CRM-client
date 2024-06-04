@@ -17,6 +17,7 @@ import { selectCountries } from '../store/countriesSlice';
 import { selectTags } from '../store/tagsSlice';
 import { SERVER_IP } from 'app/configs/routesConfig';
 import { getChat, getChatByContactId, selectChatById } from '../../chat/store/chatListSlice';
+import BoardCardDialog from '../../scrumboard/board/dialogs/card/BoardCardDialog';
 
 /**
  * The contact view.
@@ -43,6 +44,20 @@ function ContactView() {
     if (status === 'loading') {
         return <FuseLoading className="min-h-screen" />;
     }
+
+    const statusColor = (status) => {
+        if (status === 'Новый') {
+            return 'bg-orange-300';
+        } else if (status === 'В работе') {
+            return 'bg-blue-400';
+        } else if (status === 'Завершен') {
+            return 'bg-green-500';
+        } else if (status === 'Отменен') {
+            return 'bg-grey-500';
+        } else {
+            return 'bg-black-500';
+        }
+    };
 
     if (!contact) {
         return null;
@@ -197,12 +212,38 @@ function ContactView() {
                             </div>
                         </div>
 
-                        {/* {contact.address && (
-							<div className="flex items-center">
-								<FuseSvgIcon>heroicons-outline:location-marker</FuseSvgIcon>
-								<div className="ml-24 leading-6">{contact.address}</div>
-							</div>
-						)} */}
+                        {contact.cards && (
+                            <div className="flex flex-col">
+                                <div>Ссылка на GetCourse:</div>
+                                <a href={contact.cards[0].card_deal_url}>Перейти</a>
+                            </div>
+                        )}
+
+                        {contact.cards && (
+                            <div className="flex flex-col">
+                                <div className="mb-4">Заказы:</div>
+                                {contact.cards.map((el, i) => (
+                                    <div className="flex" key={i}>
+                                        <div className="flex">
+                                            <div>{el.card_deal_title}</div>
+                                            <div
+                                                className={`${statusColor(
+                                                    el.card_deal_status,
+                                                )} ml-4 mr-4 pl-4 pr-4 rounded-4 text-white`}
+                                            >
+                                                {el.card_deal_status}
+                                            </div>
+                                        </div>
+
+                                        <a
+                                            href={`https://beechat.ru/apps/scrumboard/boards/${el.board_id}/card/${el.card_id}`}
+                                        >
+                                            открыть
+                                        </a>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
 
                         {/* {contact.birthday && (
 							<div className="flex items-center">
@@ -224,6 +265,7 @@ function ContactView() {
                     </div>
                 </div>
             </div>
+            <BoardCardDialog />
         </>
     );
 }

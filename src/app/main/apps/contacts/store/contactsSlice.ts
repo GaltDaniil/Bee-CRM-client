@@ -12,7 +12,7 @@ import { AppRootStateType } from '.';
 export const getContacts = createAppAsyncThunk<ContactsType>(
     'contactsApp/contacts/getContacts',
     async () => {
-        const response = await axios.get('/api/contacts');
+        const response = await axios.get('/api/contacts/part?limit=50');
 
         const data = (await response.data) as ContactsType;
         console.log('контакты', data);

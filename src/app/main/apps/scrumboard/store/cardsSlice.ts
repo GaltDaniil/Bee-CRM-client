@@ -44,6 +44,27 @@ export const newCard = createAppAsyncThunk<
     return data;
 });
 
+export const newCardFromChat = createAppAsyncThunk<
+    string,
+    {
+        contact_id: string;
+        contact_first_name: string;
+        contact_last_name: string;
+        contact_email: string;
+        contact_phone: string;
+        card_deal_offers: string[];
+        chat_id: string;
+        list_id: string;
+        board_id: string;
+    }
+>('scrumboardApp/cards/newCardFromChat', async (data) => {
+    const response = await axios.post(`/api/scrumboard/boards/${data.board_id}/cards/create`, data);
+
+    //const data = (await response.data) as CardType;
+
+    return 'data';
+});
+
 const cardsAdapter = createEntityAdapter<CardType>({
     selectId: (card) => card.card_id,
 });

@@ -319,13 +319,18 @@ function Chat(props: ChatPropsType) {
                                                     <div className="leading-tight whitespace-pre-wrap">
                                                         {item.message_value}
                                                         {item.attachments
-                                                            ? item.attachments.map((attachment) => (
-                                                                  <div className="mt-10 max-w-300">
-                                                                      <CardAttachment
-                                                                          attachment={attachment}
-                                                                      />
-                                                                  </div>
-                                                              ))
+                                                            ? item.attachments.map(
+                                                                  (attachment, index) => (
+                                                                      <div className="mt-10 max-w-300">
+                                                                          <CardAttachment
+                                                                              key={index}
+                                                                              attachment={
+                                                                                  attachment
+                                                                              }
+                                                                          />
+                                                                      </div>
+                                                                  ),
+                                                              )
                                                             : null}
                                                         <div
                                                             className="text-11 opacity-60 mt-4"

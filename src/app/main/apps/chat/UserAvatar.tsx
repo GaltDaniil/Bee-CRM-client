@@ -46,6 +46,15 @@ function UserAvatar(props: UserAvatarPropsType) {
     const { user, className } = props;
 
     const status = _.find(Statuses, { value: user.user_status || user.contact_status });
+    const colorBorder = () => {
+        if (user.contact_getcourse && user.contact_bothelp_kn) {
+            return { borderLeft: '6px solid red', borderRight: '6px solid green' };
+        } else if (user.contact_getcourse) {
+            return { borderRight: '6px solid green' };
+        } else if (user.contact_bothelp_kn) {
+            return { borderLeft: '6px solid red' };
+        }
+    };
 
     return (
         <StyledBadge
@@ -70,6 +79,16 @@ function UserAvatar(props: UserAvatarPropsType) {
                     ? user?.user_name[0]
                     : ''}
             </Avatar>
+            {user.contact_getcourse ? (
+                <div className="absolute w-14 h-14 bg-green-900 rounded-6 text-white text-xs text-center">
+                    G
+                </div>
+            ) : null}
+            {user.contact_bothelp_bs || user.contact_bothelp_kn || user.contact_getcourse ? (
+                <div className="absolute w-14 h-14 bottom-0 bg-red-400 rounded-6 text-white text-xs text-center">
+                    B
+                </div>
+            ) : null}
         </StyledBadge>
     );
 }

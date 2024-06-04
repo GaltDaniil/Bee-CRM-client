@@ -25,6 +25,7 @@ export const getChatListPart = createAppAsyncThunk<ChatListType, number>(
         const response = await axios.get(`/api/chat/part?limit=${limit}`);
 
         const data = (await response.data) as ChatListType;
+        console.log('Получил от парт', data);
 
         return data;
     },
