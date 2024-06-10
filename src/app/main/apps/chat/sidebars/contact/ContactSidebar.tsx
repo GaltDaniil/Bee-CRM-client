@@ -1,18 +1,28 @@
-import IconButton from '@mui/material/IconButton';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
 import format from 'date-fns/format';
 import { useParams } from 'react-router-dom';
 import { useContext } from 'react';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
+
 import { lighten } from '@mui/material/styles';
+import IconButton from '@mui/material/IconButton';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import CircularProgress from '@mui/material/CircularProgress';
+
 import { useAppDispatch, useAppSelector } from 'app/store';
 import { getContactByChatId, selectChatContact } from '../../store/contactsSlice';
 import UserAvatar from '../../UserAvatar';
 import { ChatAppContext } from '../../ChatApp';
-import { selectChatById } from '../../store/chatListSlice';
-import { useEffect } from 'react';
+import { selectChatById, updateOneChat } from '../../store/chatListSlice';
+import { useEffect, useState } from 'react';
+import {
+    getContactByEmail,
+    removeContact,
+    updateContact,
+} from '../../../contacts/store/contactSlice';
 
 function ContactSidebar() {
     const dispatch = useAppDispatch();
@@ -21,6 +31,45 @@ function ContactSidebar() {
     const chat_id = routeParams.id;
     const selectedChat = useAppSelector(selectChatById(chat_id));
     const { data: contact } = useAppSelector(selectChatContact);
+
+    // Состояние для email, найденного контакта и загрузки
+    const [email, setEmail] = useState('');
+    const [foundContact, setFoundContact] = useState(null);
+    const [isLinkButtonActive, setIsLinkButtonActive] = useState(false);
+
+    const handleSearch = async () => {
+        // запрос на сервер для поиска контакта по email
+        const response = await dispatch(getContactByEmail(email));
+
+        if (response.payload) {
+            setFoundContact(response.payload);
+            setIsLinkButtonActive(true);
+        } else {
+            setFoundContact(null);
+            setIsLinkButtonActive(false);
+        }
+    };
+
+    const handleLink = async () => {
+        if (foundContact) {
+            // запрос на сервер для связывания найденного контакта с chat_id
+            const result = await dispatch(
+                updateOneChat({ ...selectedChat, contact_id: foundContact.contact_id }),
+            );
+            console.log('смена контакта в чате result.payload', result.payload);
+            if (result.payload) {
+                await dispatch(
+                    updateContact({
+                        contact_id: foundContact.contact_id,
+                        contact_photo_url: selectedChat.chat_contact.contact_photo_url,
+                    }),
+                );
+                await dispatch(removeContact(selectedChat.contact_id));
+                console.log('контакт удален');
+            }
+            setIsLinkButtonActive(false);
+        }
+    };
 
     useEffect(() => {
         if (selectedChat) {
@@ -149,41 +198,48 @@ function ContactSidebar() {
                         </Typography>
                     ) : null}
                 </div>
-
-                {/* <div className="mt-16">
-                    <Typography className="text-14 font-medium" color="text.secondary">
-                        Title
-                    </Typography>
-
-                    <Typography>{contact.details.title}</Typography>
-                </div> */}
-
-                {/* <div className="mt-16">
-                    <Typography className="text-14 font-medium" color="text.secondary">
-                        Company
-                    </Typography>
-
-                    <Typography>{contact.details.company}</Typography>
-                </div> */}
-
-                {/* <div className="mt-16">
-					<Typography
-						className="text-14 font-medium"
-						color="text.secondary"
-					>
-						Birthday
-					</Typography>
-
-					<Typography>{format(new Date(contact.details.birthday), 'P')}</Typography>
-				</div> */}
-
-                {/* <div className="mt-16">
-                    <Typography className="text-14 font-medium" color="text.secondary">
-                        Address
-                    </Typography>
-
-                    <Typography>{contact.details.address}</Typography>
-                </div> */}
+                <div>
+                    {!selectedChat.chat_contact.contact_getcourse ? (
+                        <div className="flex flex-col p-24">
+                            <Typography className="text-14 font-medium" color="text.secondary">
+                                Связать чат с контактом
+                            </Typography>
+                            <TextField
+                                label="Email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                fullWidth
+                                margin="normal"
+                            />
+                            {foundContact ? (
+                                <>
+                                    <Typography
+                                        className="text-14 font-medium"
+                                        color="text.secondary"
+                                    >
+                                        Найденный контакт:
+                                    </Typography>
+                                    <div className="mb-10">{foundContact.contact_name}</div>
+                                </>
+                            ) : null}
+                            <Button variant="contained" onClick={handleSearch} fullWidth>
+                                Поиск
+                            </Button>
+                            {foundContact && (
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    onClick={handleLink}
+                                    fullWidth
+                                    disabled={!isLinkButtonActive}
+                                    className="mt-16"
+                                >
+                                    Связать
+                                </Button>
+                            )}
+                        </div>
+                    ) : null}
+                </div>
             </div>
         </div>
     );

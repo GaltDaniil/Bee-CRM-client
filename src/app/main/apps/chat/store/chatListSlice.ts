@@ -19,17 +19,16 @@ export const getChatList = createAppAsyncThunk<ChatListType>('chatApp/chatList/g
     return data;
 });
 
-export const getChatListPart = createAppAsyncThunk<ChatListType, number>(
-    'chatApp/chatList/getPart',
-    async (limit) => {
-        const response = await axios.get(`/api/chat/part?limit=${limit}`);
+export const getChatListPart = createAppAsyncThunk<
+    ChatListType,
+    { limit: number; filter?: string }
+>('chatApp/chatList/getPart', async (data) => {
+    const response = await axios.get(`/api/chat/part?limit=${data.limit}&filter=${data.filter}`);
 
-        const data = (await response.data) as ChatListType;
-        console.log('Получил от парт', data);
+    const chats = (await response.data) as ChatListType;
 
-        return data;
-    },
-);
+    return chats;
+});
 
 export const getChat = createAppAsyncThunk<ChatListItemType, ChatListItemType['chat_id']>(
     'chatApp/chatList/getOne',
@@ -56,6 +55,16 @@ export const readChatMessages = createAppAsyncThunk<ChatListItemType, ChatListIt
         const response = await axios.patch(`/api/chat/${chat_id}/read-all`);
         const data = (await response.data) as ChatListItemType;
         getChatList();
+        return data;
+    },
+);
+
+export const updateOneChat = createAppAsyncThunk<ChatListItemType, ChatListItemType>(
+    'chatApp/chatList/updateOneChat',
+    async (body) => {
+        const response = await axios.put(`/api/chat/${body.chat_id}`, body);
+        const data = (await response.data) as ChatListItemType;
+
         return data;
     },
 );

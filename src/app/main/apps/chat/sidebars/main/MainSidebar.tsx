@@ -1,9 +1,13 @@
 import FuseScrollbars from '@fuse/core/FuseScrollbars';
 import FuseUtils from '@fuse/utils';
+
 import Input from '@mui/material/Input';
 import List from '@mui/material/List';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+
 import { motion } from 'framer-motion';
 import { useContext, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
@@ -34,9 +38,16 @@ function MainSidebar() {
 
     const [searchText, setSearchText] = useState('');
 
+    const [alignment, setAlignment] = useState('all');
+
+    const handleChange = (event: React.MouseEvent<HTMLElement>, newAlignment: string) => {
+        setAlignment(newAlignment);
+    };
+
     // Функционал бесконечной загрузки
     const [isLoading, setIsLoading] = useState(false);
     const [limit, setLimit] = useState(20);
+    const [filter, setFilter] = useState('');
 
     function handleSearchText(event: React.ChangeEvent<HTMLInputElement>) {
         setSearchText(event.target.value);
@@ -45,19 +56,19 @@ function MainSidebar() {
     function loadingMoreChats() {
         console.log('limit', limit);
         const newLimit = limit + 20;
-        dispatch(getChatListPart(newLimit));
+        dispatch(getChatListPart({ limit: newLimit, filter }));
         setLimit(newLimit);
     }
 
     React.useEffect(() => {
         socket.on('update', () => {
-            dispatch(getChatListPart(limit));
+            dispatch(getChatListPart({ limit, filter }));
             console.log('update');
         });
     }, []);
 
     React.useEffect(() => {
-        dispatch(getChatListPart(limit));
+        dispatch(getChatListPart({ limit, filter }));
     }, [dispatch]);
 
     return (
@@ -96,7 +107,7 @@ function MainSidebar() {
                             </FuseSvgIcon>
 
                             <Input
-                                placeholder="Search or start new chat"
+                                placeholder="Поиск по чатам"
                                 className="flex flex-1 px-8"
                                 disableUnderline
                                 fullWidth
@@ -160,14 +171,30 @@ function MainSidebar() {
                                 animate="show"
                             >
                                 {filteredChatList.length > 0 && (
-                                    <motion.div variants={item}>
-                                        <Typography
-                                            className="font-medium text-20 px-32 py-24"
-                                            color="secondary.main"
+                                    <>
+                                        <motion.div variants={item}>
+                                            <Typography
+                                                className="font-medium text-20 px-32 py-24"
+                                                color="secondary.main"
+                                            >
+                                                Чаты
+                                            </Typography>
+                                        </motion.div>
+                                        <ToggleButtonGroup
+                                            color="primary"
+                                            value={alignment}
+                                            exclusive
+                                            size="small"
+                                            onChange={handleChange}
+                                            aria-label="Platform"
                                         >
-                                            Чаты
-                                        </Typography>
-                                    </motion.div>
+                                            <ToggleButton value="all">Все</ToggleButton>
+                                            <ToggleButton value="unread">
+                                                Непрочитанные
+                                            </ToggleButton>
+                                            <ToggleButton value="orders">Есть заказы</ToggleButton>
+                                        </ToggleButtonGroup>
+                                    </>
                                 )}
 
                                 {filteredChatList

@@ -28,6 +28,24 @@ export const getContact = createAppAsyncThunk<ContactType, string>(
     },
 );
 
+export const getContactByEmail = createAppAsyncThunk<ContactType, string>(
+    'contactsApp/task/getContactByEmail',
+    async (email, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(`/api/contacts/findByEmail/${email}`);
+
+            const data = (await response.data) as ContactType;
+
+            return data;
+        } catch (error) {
+            history.push({ pathname: `/apps/contacts` });
+
+            const axiosError = error as AxiosError;
+            return rejectWithValue(axiosError.message);
+        }
+    },
+);
+
 export const addContact = createAppAsyncThunk<ContactType, ContactType>(
     'contacts/add',
     async (contact: ContactType, { rejectWithValue }) => {

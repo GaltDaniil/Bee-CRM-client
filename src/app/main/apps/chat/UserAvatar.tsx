@@ -80,11 +80,11 @@ function UserAvatar(props: UserAvatarPropsType) {
                     : ''}
             </Avatar>
             {user.contact_getcourse ? (
-                <div className="absolute w-14 h-14 bg-green-900 rounded-6 text-white text-xs text-center">
+                <div className="absolute w-14 h-14 bg-green-900 border-2 border-white rounded-6 text-white text-[8px] text-center">
                     G
                 </div>
             ) : null}
-            {user.contact_bothelp_bs || user.contact_bothelp_kn || user.contact_getcourse ? (
+            {user.contact_bothelp_bs || user.contact_bothelp_kn ? (
                 <div className="absolute w-14 h-14 bottom-0 bg-red-400 rounded-6 text-white text-xs text-center">
                     B
                 </div>
