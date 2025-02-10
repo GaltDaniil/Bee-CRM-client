@@ -1,4 +1,5 @@
 import { ChatListItemType } from '../../chat/types/ChatListItemType';
+import { ChatListType } from '../../chat/types/ChatListType';
 import { CardType } from '../../scrumboard/types/CardType';
 import { ContactEmailsType } from './ContactEmailType';
 import { ContactPhoneNumbersType } from './ContactPhoneNumberType';
@@ -18,7 +19,7 @@ export type ContactType2 = {
 export type ContactType = {
     account_id: string;
     cards: CardType[];
-    chats: ChatListItemType;
+    chats: ChatListType;
     contact_about: string;
     contact_address: string;
     contact_birthday: string;
@@ -31,6 +32,11 @@ export type ContactType = {
     contact_phone: string;
     contact_photo_url: string;
     contact_status: string;
+    contact_getcourse: boolean;
+    contact_getcourse_link: string;
+    contact_bothelp_kn: boolean;
+    contact_bothelp_bs: boolean;
+    contact_wa_status: boolean;
     createdAt: string;
     updatedAt: string;
 };

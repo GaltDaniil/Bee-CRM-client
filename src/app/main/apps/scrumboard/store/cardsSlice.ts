@@ -56,6 +56,7 @@ export const newCardFromChat = createAppAsyncThunk<
         chat_id: string;
         list_id: string;
         board_id: string;
+        alreadyBind: boolean;
     }
 >('scrumboardApp/cards/newCardFromChat', async (data) => {
     const response = await axios.post(`/api/scrumboard/boards/${data.board_id}/cards/create`, data);

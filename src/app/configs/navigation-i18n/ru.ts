@@ -4,6 +4,7 @@ const locale = {
     CHAT: 'Чат',
     CONTACTS: 'Контакты',
     SETTINGS: 'Настройки',
+    ORDERS: 'Заказы',
 };
 
 export default locale;

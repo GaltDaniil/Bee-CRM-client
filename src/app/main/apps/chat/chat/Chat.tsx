@@ -23,13 +23,12 @@ import ChatMoreMenu from './ChatMoreMenu';
 import { ChatAppContext } from '../ChatApp';
 import { ChatMessageType } from '../types/ChatMessageType';
 import Error404Page from '../../../404/Error404Page';
-import { getChatList, readChatMessages, selectChatById } from '../store/chatListSlice';
+import { readChatMessages, selectChatById } from '../store/chatListSlice';
 import ru from 'date-fns/locale/ru';
 import { format } from 'date-fns';
 import socket from 'src/app/socket';
 import CardAttachment from '../attachment/ChatAttachment';
 import FuseLoading from '@fuse/core/FuseLoading';
-import { border, borderRadius } from '@mui/system';
 
 const StyledMessageRow = styled('div')(({ theme }) => ({
     '&.contact': {
@@ -123,13 +122,17 @@ function Chat(props: ChatPropsType) {
     const chat_id = routeParams.id;
     const selectedChat = useAppSelector(selectChatById(chat_id));
     const chatRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef(null);
     const [message_value, setMessageValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [attachments, setAttachments] = useState([]);
 
     useEffect(() => {
         const updateHandler = (data) => {
-            if (data.message.chat_id === chat_id) {
-                dispatch(addNewMessage(data.message));
+            console.log('data.chat_id', data);
+            console.log('chat_id', chat_id);
+            if (data.chat_id === chat_id) {
+                dispatch(addNewMessage(data));
             }
 
             //dispatch(getMessages(data.message.chat_id));
@@ -143,10 +146,9 @@ function Chat(props: ChatPropsType) {
     }, [chat_id, dispatch]);
 
     useEffect(() => {
-        console.log('отсновной эффект');
         setIsLoading(true);
         dispatch(getMessages(chat_id));
-        dispatch(getChatList());
+        //dispatch(getChatListPart({ limit: 20, filter: 'all' }));
         if (selectedChat) dispatch(readChatMessages(chat_id));
         setIsLoading(false);
     }, [chat_id, dispatch]);
@@ -157,6 +159,50 @@ function Chat(props: ChatPropsType) {
         }
     }, [messages]);
 
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (!event.target.files) return;
+
+        const newFiles = Array.from(event.target.files).map((file) => ({
+            id: crypto.randomUUID(), // Уникальный ID для удаления
+            file,
+            preview: URL.createObjectURL(file), // Локальное превью
+            from: 'crm',
+        }));
+
+        setAttachments((prev) => [...prev, ...newFiles]);
+    };
+
+    // Удаление файла перед отправкой
+    const removeAttachment = (id: string) => {
+        setAttachments((prev) => {
+            const updatedAttachments = prev.filter((file) => file.id !== id);
+
+            // Освобождаем память, удаляя blob-ссылку
+            const removedFile = prev.find((file) => file.id === id);
+            if (removedFile) {
+                URL.revokeObjectURL(removedFile.preview);
+            }
+
+            return updatedAttachments;
+        });
+    };
+
+    // Открытие файлового диалога
+    const handleFileAttach = () => {
+        fileInputRef.current?.click();
+    };
+
+    function managerName(manager_id) {
+        if (manager_id === '33c7458d29f5372989deaf5e') {
+            return 'Лия';
+        } else if (manager_id === '874dfd47858891a12e31c247') {
+            return 'Анастасия';
+        } else if (manager_id === 'aaf697912ffecceee61fa87b') {
+            return 'Даниил';
+        } else if (manager_id === '771ccea386b7a316f51d6ecd') {
+            return 'Александра';
+        }
+    }
     function differenceInDays(date1: Date, date2: Date): number {
         const ONE_DAY = 1000 * 60 * 60 * 24;
         const diffInMs = Math.abs(date1.getTime() - date2.getTime());
@@ -208,6 +254,11 @@ function Chat(props: ChatPropsType) {
         if (message_value === '') {
             return;
         }
+
+        let uploadedAttachments = [];
+
+        // Загружаем файлы на сервер
+
         dispatch(
             sendMessage({
                 message_value,
@@ -215,11 +266,15 @@ function Chat(props: ChatPropsType) {
                 contact_id: selectedChat.contact_id,
                 manager_id: user.user_id,
                 message_type: 'text',
+                message_from: 'crm',
                 messenger_type: selectedChat.messenger_type,
                 messenger_id: selectedChat.messenger_id,
+                attachments,
             }),
         ).then(() => {
             setMessageValue('');
+            attachments.forEach((file) => URL.revokeObjectURL(file.preview)); // Удаляем blob-ссылки
+            setAttachments([]);
         });
     }
 
@@ -233,6 +288,20 @@ function Chat(props: ChatPropsType) {
     if (!user || !messages /* || !selectedContact */) {
         return <Error404Page />;
     }
+
+    const copyToClipboard = () => {
+        if (selectedChat?.chat_id) {
+            window.parent.postMessage({ action: 'copy', text: selectedChat.chat_id }, '*');
+            navigator.clipboard
+                .writeText(selectedChat.chat_id)
+                .then(() => {
+                    alert('ID чата скопирован');
+                })
+                .catch((err) => {
+                    console.error('Ошибка при копировании:', err);
+                });
+        }
+    };
 
     const inputStyle = {
         whiteSpace: 'normal',
@@ -275,10 +344,21 @@ function Chat(props: ChatPropsType) {
                             >
                                 <UserAvatar
                                     className="relative mx-8"
+                                    //@ts-ignore
                                     user={selectedChat?.chat_contact}
                                 />
                                 <Typography color="inherit" className="text-16 font-semibold px-4">
                                     {selectedChat?.chat_contact.contact_name}
+                                </Typography>
+                                <Typography
+                                    color="secondary"
+                                    className="text-14 underline cursor-pointer ml-4"
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // Останавливаем всплытие события, чтобы не открывать сайдбар
+                                        copyToClipboard();
+                                    }}
+                                >
+                                    Скопировать ID чата
                                 </Typography>
                             </div>
                         ) : null}
@@ -342,7 +422,12 @@ function Chat(props: ChatPropsType) {
                                                                 {
                                                                     locale: ru,
                                                                 },
-                                                            )}
+                                                            )}{' '}
+                                                            {item.manager_id
+                                                                ? `от ${managerName(
+                                                                      item.manager_id,
+                                                                  )}`
+                                                                : null}
                                                         </div>
                                                     </div>
 
@@ -379,19 +464,34 @@ function Chat(props: ChatPropsType) {
                                         <FuseSvgIcon className="text-24" color="action">
                                             heroicons-outline:emoji-happy
                                         </FuseSvgIcon>
-                                    </IconButton>
+                                    </IconButton> */}
 
-                                    <IconButton type="submit" size="large">
+                                    {/* Кнопка для выбора файла */}
+                                    <IconButton
+                                        type="button"
+                                        size="large"
+                                        onClick={handleFileAttach}
+                                    >
                                         <FuseSvgIcon className="text-24" color="action">
                                             heroicons-outline:paper-clip
                                         </FuseSvgIcon>
-                                    </IconButton> */}
+                                    </IconButton>
+
+                                    {/* Скрытое input для загрузки файлов */}
+                                    <input
+                                        type="file"
+                                        multiple
+                                        ref={fileInputRef}
+                                        className="hidden"
+                                        onChange={handleFileChange}
+                                        accept="image/*"
+                                    />
 
                                     <InputBase
                                         autoFocus={false}
                                         id="message-input"
                                         className="flex-1 flex grow shrink-0 mx-8 px-16 border-2 resize-none whitespace-normal overflow-y-auto border-radius-10"
-                                        placeholder="Type your message"
+                                        placeholder="Напишите ваше сообщение"
                                         onChange={onInputChange}
                                         value={message_value}
                                         onKeyDown={handleKeyDown}
@@ -406,6 +506,24 @@ function Chat(props: ChatPropsType) {
                                             heroicons-outline:paper-airplane
                                         </FuseSvgIcon>
                                     </IconButton>
+                                </div>
+                                {/* Превью прикрепленных изображений */}
+                                <div className="flex gap-2 mb-2">
+                                    {attachments.map((file) => (
+                                        <div key={file.id} className="relative p-6 w-60 h-60">
+                                            <img
+                                                src={file.preview}
+                                                alt="Preview"
+                                                className="w-full h-full object-cover rounded-lg"
+                                            />
+                                            <button
+                                                className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-12 h-12 flex items-center justify-center"
+                                                onClick={() => removeAttachment(file.id)}
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    ))}
                                 </div>
                             </Paper>
                         )}

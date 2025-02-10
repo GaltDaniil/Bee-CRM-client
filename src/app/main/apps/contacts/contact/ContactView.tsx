@@ -63,6 +63,8 @@ function ContactView() {
         return null;
     }
 
+    console.log('contact.cards', contact.cards);
+
     return (
         <>
             <Box
@@ -113,7 +115,7 @@ function ContactView() {
                         {contact.contact_name}
                     </Typography>
 
-                    <div className="flex flex-wrap items-center mt-8">
+                    {/* <div className="flex flex-wrap items-center mt-8">
                         {contact?.tags?.map((id) => (
                             <Chip
                                 key={id}
@@ -122,7 +124,7 @@ function ContactView() {
                                 size="small"
                             />
                         ))}
-                    </div>
+                    </div> */}
 
                     <Divider className="mt-16 mb-24" />
 
@@ -212,14 +214,14 @@ function ContactView() {
                             </div>
                         </div>
 
-                        {contact.cards && (
+                        {contact.cards.length > 0 && (
                             <div className="flex flex-col">
                                 <div>Ссылка на GetCourse:</div>
                                 <a href={contact.cards[0].card_deal_url}>Перейти</a>
                             </div>
                         )}
 
-                        {contact.cards && (
+                        {contact.cards.length > 0 && (
                             <div className="flex flex-col">
                                 <div className="mb-4">Заказы:</div>
                                 {contact.cards.map((el, i) => (

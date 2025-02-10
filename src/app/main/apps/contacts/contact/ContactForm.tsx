@@ -274,7 +274,7 @@ function ContactForm() {
                         />
                     )}
                 />
-                <Controller
+                {/* <Controller
                     control={control}
                     name="tags"
                     render={({ field: { onChange, value } }) => (
@@ -305,7 +305,7 @@ function ContactForm() {
                             )}
                         />
                     )}
-                />
+                /> */}
 
                 {/* <Controller
                     control={control}
@@ -442,7 +442,7 @@ function ContactForm() {
 						/>
 					)}
 				/> */}
-                <Controller
+                {/* <Controller
                     control={control}
                     name="notes"
                     render={({ field }) => (
@@ -471,7 +471,7 @@ function ContactForm() {
                             }}
                         />
                     )}
-                />
+                /> */}
             </div>
 
             <Box

@@ -8,6 +8,7 @@ export type AttachmentType = {
     time: number;
     attachment_type: string;
     attachment_url?: string;
+    attachment_extension?: string;
     attachment_market?: {
         price: string;
         title: string;

@@ -11,4 +11,5 @@ export type ChatContactType = {
     contact_getcourse: boolean;
     contact_bothelp_kn: boolean;
     contact_bothelp_bs: boolean;
+    contact_cards: [object];
 };

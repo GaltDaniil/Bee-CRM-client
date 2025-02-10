@@ -44,6 +44,16 @@ export const WidgetButtons = () => {
     return (
         <div className="absolute bottom-0 right-0">
             <div className="mb-8">
+                <a target="_blank" href={`https://wa.me/79964390394`} rel="noreferrer">
+                    <img
+                        src={`https://beechat.ru/assets/icons/wa.png`}
+                        alt="tg"
+                        width={50}
+                        height={50}
+                    />
+                </a>
+            </div>
+            <div className="mb-8">
                 <a
                     target="_blank"
                     href={`https://vk.me/public212085097?ref=fromUrl=${fromUrl}`}

@@ -10,6 +10,13 @@ import { AppRootStateType } from '.';
 /**
  * Get contacts from server
  */
+interface NewContactType {
+    contact_name: string;
+    contact_phone: string;
+    contact_email: string;
+    contact_getcourse_link: string;
+}
+
 export const getContact = createAppAsyncThunk<ContactType, string>(
     'contactsApp/task/getContact',
     async (contact_id, { rejectWithValue }) => {
@@ -58,7 +65,7 @@ export const addContact = createAppAsyncThunk<ContactType, ContactType>(
         }
     },
 );
-export const newContact = createAppAsyncThunk<ContactType, ContactType>(
+export const newContact = createAppAsyncThunk<ContactType, NewContactType>(
     'contacts/add',
     async (contact: ContactType, { rejectWithValue }) => {
         try {

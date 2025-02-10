@@ -1,4 +1,4 @@
-import { createContext, useEffect, useMemo, useState } from 'react';
+import { createContext, Suspense, useEffect, useMemo, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 
 import { styled } from '@mui/material/styles';
@@ -12,7 +12,6 @@ import UserSidebar from './sidebars/user/UserSidebar';
 
 import { getUserData } from './store/userSlice';
 import { getContacts } from './store/contactsSlice';
-import { getChatList, getChatListPart } from './store/chatListSlice';
 import { selectUser } from 'app/store/user/userSlice';
 
 import { useAppDispatch, useAppSelector } from 'app/store';
@@ -62,7 +61,6 @@ function ChatApp() {
     const [contactSidebarOpen, setContactSidebarOpen] = useState(false);
     const [orderSidebarOpen, setOrderSidebarOpen] = useState(false);
     const [userSidebarOpen, setUserSidebarOpen] = useState(false);
-    const [limit, setLimit] = useState(20);
     const location = useLocation();
 
     useEffect(() => {
@@ -107,12 +105,20 @@ function ChatApp() {
                     setMainSidebarOpen(false);
                 }}
                 leftSidebarWidth={400}
-                rightSidebarContent={<ContactSidebar />}
+                rightSidebarContent={
+                    <Suspense fallback={<div>Loading...</div>}>
+                        {contactSidebarOpen && <ContactSidebar />}
+                    </Suspense>
+                }
                 rightSidebarOpen={contactSidebarOpen}
                 rightSidebarOnClose={() => {
                     setContactSidebarOpen(false);
                 }}
-                rightOrderSidebarContent={<OrderSidebar />}
+                rightOrderSidebarContent={
+                    <Suspense fallback={<div>Loading...</div>}>
+                        {orderSidebarOpen && <OrderSidebar />}
+                    </Suspense>
+                }
                 rightOrderSidebarOpen={orderSidebarOpen}
                 rightOrderSidebarOnClose={() => {
                     setOrderSidebarOpen(false);

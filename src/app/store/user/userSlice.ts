@@ -167,13 +167,13 @@ export const updateUserData = createAppAsyncThunk<UserType, PartialDeep<UserType
  * The initial state of the user slice.
  */
 const initialState: UserType = {
-    user_id: '123',
+    user_id: '',
     user_role: [], // guest
     data: {
-        user_name: 'John Doe',
-        user_photo_url: 'assets/images/avatars/brian-hughes.jpg',
-        user_email: 'johndoe@withinpixels.com',
-        user_shortcuts: ['apps.calendar', 'apps.mailbox', 'apps.contacts', 'apps.tasks'],
+        user_name: '',
+        user_photo_url: '',
+        user_email: '',
+        user_shortcuts: [],
     },
 };
 

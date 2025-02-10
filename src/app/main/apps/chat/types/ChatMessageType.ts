@@ -10,6 +10,7 @@ export type ChatMessageType = {
     manager_id: string;
     message_value: string;
     message_type: string;
+    message_from: string;
     is_readed: boolean;
     createdAt: string;
     attachments: AttachmentType[];

@@ -18,6 +18,8 @@ import { ContactType } from '../../../contacts/types/ContactType';
 import { Autocomplete, InputAdornment, TextField, Button } from '@mui/material';
 import axios from 'axios';
 import { newCardFromChat } from '../../../scrumboard/store/cardsSlice';
+import { useSelector } from 'react-redux';
+import { selectUser } from 'app/store/user/userSlice';
 
 function OrderSidebar() {
     const dispatch = useAppDispatch();
@@ -25,6 +27,7 @@ function OrderSidebar() {
     const routeParams = useParams();
     const chat_id = routeParams.id;
     const selectedChat = useAppSelector(selectChatById(chat_id));
+    const user = useSelector(selectUser);
     const { data: contact } = useAppSelector(selectChatContact);
 
     const [orders, setOrders] = useState([]);
@@ -39,6 +42,8 @@ function OrderSidebar() {
         chat_id: string;
         list_id: string;
         board_id: string;
+        manager_email: string;
+        alreadyBind: boolean;
     };
 
     const { control, watch, reset, handleSubmit, formState } = useForm<FormType>({
@@ -48,14 +53,16 @@ function OrderSidebar() {
     const { isValid, dirtyFields, errors } = formState;
 
     const onSubmit = (data: FormType) => {
+        data.alreadyBind = false;
         if (!data.contact_email) {
+            data.alreadyBind = true;
             data.contact_email = contact.contact_email;
         }
         data.chat_id = chat_id;
         data.contact_id = contact.contact_id;
         data.list_id = 'new';
         data.board_id = 'QSZj8tM1PRsfs-DBZq3Ph';
-        console.log('Form Data:', data);
+        data.manager_email = user.data.user_email;
         // Отправка данных на сервер
         dispatch(newCardFromChat(data));
         setOrderSidebarOpen(false);

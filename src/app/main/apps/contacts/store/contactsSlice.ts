@@ -9,13 +9,31 @@ import { AppRootStateType } from '.';
 /**
  * Get contacts from server
  */
-export const getContacts = createAppAsyncThunk<ContactsType>(
-    'contactsApp/contacts/getContacts',
-    async () => {
-        const response = await axios.get('/api/contacts/part?limit=50');
 
-        const data = (await response.data) as ContactsType;
-        console.log('контакты', data);
+interface contactData {
+    contacts: ContactType[];
+    totalPages: number;
+    currentPage: number;
+}
+
+export const getContacts = createAppAsyncThunk<contactData, { limit: number; page: number }>(
+    'contactsApp/contacts/getContacts',
+    async ({ limit, page }) => {
+        const response = await axios.get(`/api/contacts/part?limit=${limit}&page=${page}`);
+
+        const data = (await response.data) as contactData;
+        console.log('дата контакты', data);
+        return data;
+    },
+);
+
+export const searchContact = createAppAsyncThunk<ContactType[], { type: string; value: string }>(
+    'contactsApp/contacts/searchContact',
+    async ({ type, value }) => {
+        const response = await axios.get(`/api/contacts/search?type=${type}&value=${value}`);
+
+        const data = (await response.data) as ContactType[];
+        console.log('searchdata', data);
         return data;
     },
 );
@@ -80,6 +98,8 @@ export const selectGroupedFilteredContacts = createSelector(
 
 const initialState = contactsAdapter.getInitialState({
     searchText: '',
+    totalPages: 0,
+    currentPage: 1,
 });
 
 /**
@@ -112,8 +132,10 @@ export const contactsSlice = createSlice({
                 contactsAdapter.removeOne(state, action.payload),
             )
             .addCase(getContacts.fulfilled, (state, action) => {
+                contactsAdapter.setAll(state, action.payload.contacts);
+            })
+            .addCase(searchContact.fulfilled, (state, action) => {
                 contactsAdapter.setAll(state, action.payload);
-                state.searchText = '';
             });
     },
 });

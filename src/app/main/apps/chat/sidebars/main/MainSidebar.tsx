@@ -5,6 +5,7 @@ import Input from '@mui/material/Input';
 import List from '@mui/material/List';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
+
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
@@ -16,7 +17,7 @@ import Box from '@mui/material/Box';
 import { lighten } from '@mui/material/styles';
 import { useAppDispatch, useAppSelector } from 'app/store';
 //import ContactListItem from './ContactListItem';
-import { getChatList, getChatListPart, selectChats } from '../../store/chatListSlice';
+import { getChatListPart, selectChats } from '../../store/chatListSlice';
 import UserAvatar from '../../UserAvatar';
 import MainSidebarMoreMenu from './MainSidebarMoreMenu';
 import { ChatAppContext } from '../../ChatApp';
@@ -40,14 +41,17 @@ function MainSidebar() {
 
     const [alignment, setAlignment] = useState('all');
 
-    const handleChange = (event: React.MouseEvent<HTMLElement>, newAlignment: string) => {
-        setAlignment(newAlignment);
-    };
-
     // Функционал бесконечной загрузки
     const [isLoading, setIsLoading] = useState(false);
     const [limit, setLimit] = useState(20);
-    const [filter, setFilter] = useState('');
+    const [filter, setFilter] = useState('all');
+    const handleChange = (event: React.MouseEvent<HTMLElement>, newAlignment: string) => {
+        if (newAlignment !== null) {
+            setAlignment(newAlignment);
+            setFilter(newAlignment);
+            dispatch(getChatListPart({ limit, filter: newAlignment }));
+        }
+    };
 
     function handleSearchText(event: React.ChangeEvent<HTMLInputElement>) {
         setSearchText(event.target.value);
@@ -189,10 +193,8 @@ function MainSidebar() {
                                             aria-label="Platform"
                                         >
                                             <ToggleButton value="all">Все</ToggleButton>
-                                            <ToggleButton value="unread">
-                                                Непрочитанные
-                                            </ToggleButton>
-                                            <ToggleButton value="orders">Есть заказы</ToggleButton>
+                                            <ToggleButton value="new">Новые</ToggleButton>
+                                            <ToggleButton value="order">С заказом</ToggleButton>
                                         </ToggleButtonGroup>
                                     </>
                                 )}
@@ -250,7 +252,7 @@ function MainSidebar() {
                                 ) : null}
                             </motion.div>
                         );
-                    }, [chats, searchText, dispatch])}
+                    }, [chats, searchText, dispatch, alignment])}
                 </List>
             </FuseScrollbars>
         </div>

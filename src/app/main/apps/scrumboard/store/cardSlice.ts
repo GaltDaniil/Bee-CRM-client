@@ -107,6 +107,10 @@ export const cardSlice = createSlice({
             state.dialogOpen = false;
             state.data = null;
         },
+        updateCardDialog: (state, action) => {
+            state.dialogOpen = true;
+            state.data = action.payload as CardType;
+        },
     },
     extraReducers: (builder) => {
         builder.addCase(updateCard.fulfilled, (state, action) => {
@@ -120,7 +124,7 @@ export const cardSlice = createSlice({
 
 export const data = (state: AppRootStateType) => state.scrumboardApp.card.data;
 
-export const { openCardDialog, closeCardDialog } = cardSlice.actions;
+export const { openCardDialog, closeCardDialog, updateCardDialog } = cardSlice.actions;
 
 export const selectCardDialogOpen = (state: AppRootStateType) =>
     state.scrumboardApp.card.dialogOpen;

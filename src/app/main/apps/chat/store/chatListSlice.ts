@@ -23,7 +23,9 @@ export const getChatListPart = createAppAsyncThunk<
     ChatListType,
     { limit: number; filter?: string }
 >('chatApp/chatList/getPart', async (data) => {
-    const response = await axios.get(`/api/chat/part?limit=${data.limit}&filter=${data.filter}`);
+    const response = await axios.get(
+        `/api/chat/parttest?limit=${data.limit}&filter=${data.filter}`,
+    );
 
     const chats = (await response.data) as ChatListType;
 

@@ -10,7 +10,7 @@ import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { useAppDispatch, useAppSelector } from 'app/store';
 import { ChatMessageType } from 'app/theme-layouts/shared-components/chatPanel/types/ChatMessageType';
 import { selectSelectedContactId } from './store/contactsSlice';
-import { selectChat, sendMessage } from './store/chatMessagesSlice';
+import { selectMessages, sendMessage } from './store/chatMessagesSlice';
 import { selectUser } from './store/userSlice';
 
 const StyledMessageRow = styled('div')(({ theme }) => ({
@@ -98,7 +98,7 @@ function Chat(props: ChatProps) {
     const { className } = props;
     const dispatch = useAppDispatch();
     const selectedContactId = useAppSelector(selectSelectedContactId);
-    const messages = useAppSelector(selectChat);
+    const messages = useAppSelector(selectMessages);
     const user = useAppSelector(selectUser);
 
     const chatScroll = useRef<HTMLDivElement>(null);
@@ -136,14 +136,14 @@ function Chat(props: ChatProps) {
                         function isFirstMessageOfGroup(item: ChatMessageType, i: number) {
                             return (
                                 i === 0 ||
-                                (messages[i - 1] && messages[i - 1].contact_id !== item.contact_id)
+                                (messages[i - 1] && messages[i - 1].manager_id !== item.manager_id)
                             );
                         }
 
                         function isLastMessageOfGroup(item: ChatMessageType, i: number) {
                             return (
                                 i === messages.length - 1 ||
-                                (messages[i + 1] && messages[i + 1].contact_id !== item.contact_id)
+                                (messages[i + 1] && messages[i + 1].manager_id !== item.manager_id)
                             );
                         }
 
@@ -154,7 +154,7 @@ function Chat(props: ChatProps) {
                                           key={i}
                                           className={clsx(
                                               'flex flex-col grow-0 shrink-0 items-start justify-end relative px-16 pb-4',
-                                              item.contact_id === user.user_id ? 'me' : 'contact',
+                                              item.manager_id === user.user_id ? 'me' : 'contact',
                                               { 'first-of-group': isFirstMessageOfGroup(item, i) },
                                               { 'last-of-group': isLastMessageOfGroup(item, i) },
                                               i + 1 === messages.length && 'pb-72',

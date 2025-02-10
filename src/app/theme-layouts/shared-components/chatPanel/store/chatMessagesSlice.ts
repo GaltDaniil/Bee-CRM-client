@@ -56,7 +56,7 @@ export const chatMessagesSlice = createSlice({
     },
 });
 
-export const selectChat = (state: AppRootStateType) => state.chatPanel.messages;
+export const selectMessages = (state: AppRootStateType) => state.chatPanel.messages;
 
 export type chatMessagesSliceType = typeof chatMessagesSlice;
 

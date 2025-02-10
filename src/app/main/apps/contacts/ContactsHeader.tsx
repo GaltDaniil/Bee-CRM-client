@@ -1,13 +1,19 @@
 import Input from '@mui/material/Input';
 import Typography from '@mui/material/Typography';
-import { motion } from 'framer-motion';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+
+import { motion } from 'framer-motion';
+
 import NavLinkAdapter from '@fuse/core/NavLinkAdapter';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import Box from '@mui/material/Box';
+
 import { useAppDispatch, useAppSelector } from 'app/store';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useState } from 'react';
 import {
+    searchContact,
     selectFilteredContacts,
     selectSearchText,
     setContactsSearchText,
@@ -18,8 +24,26 @@ import {
  */
 function ContactsHeader() {
     const dispatch = useAppDispatch();
-    const searchText = useAppSelector(selectSearchText);
+    //const searchText = useAppSelector(selectSearchText);
     const filteredData = useAppSelector(selectFilteredContacts);
+
+    const [type, setType] = useState('email');
+    const [value, setValue] = useState('');
+
+    const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+        setType(newValue);
+    };
+
+    function handleSearch() {
+        dispatch(searchContact({ type, value }));
+    }
+
+    function a11yProps(index: number) {
+        return {
+            id: `simple-tab-${index}`,
+            'aria-controls': `simple-tabpanel-${index}`,
+        };
+    }
 
     return (
         <div className="p-24 sm:p-32 w-full border-b-1">
@@ -52,20 +76,32 @@ function ContactsHeader() {
                     <FuseSvgIcon color="action" size={20}>
                         heroicons-outline:search
                     </FuseSvgIcon>
-
+                    <Tabs value={type} onChange={handleChange} aria-label="basic tabs example">
+                        <Tab value={'name'} label="Имя" />
+                        <Tab value={'email'} label="Почта" />
+                        <Tab value={'phone'} label="Телефон" />
+                    </Tabs>
                     <Input
                         placeholder="Поиск контактов"
                         className="flex flex-1 px-16"
                         disableUnderline
                         fullWidth
-                        value={searchText}
+                        value={value}
                         inputProps={{
                             'aria-label': 'Search',
                         }}
-                        onChange={(ev: ChangeEvent<HTMLInputElement>) =>
-                            dispatch(setContactsSearchText(ev))
-                        }
+                        onChange={(ev: ChangeEvent<HTMLInputElement>) => {
+                            setValue(ev.target.value);
+                        }}
                     />
+                    <Button
+                        onClick={handleSearch}
+                        className="mx-8"
+                        variant="contained"
+                        color="secondary"
+                    >
+                        <span className="mx-8">Поиск</span>
+                    </Button>
                 </Box>
                 <Button
                     className="mx-8"

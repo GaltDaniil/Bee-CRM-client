@@ -50,18 +50,34 @@ function ContactSidebar() {
         }
     };
 
+    const statusColor = (status) => {
+        if (status === 'Новый') {
+            return 'bg-orange-300';
+        } else if (status === 'В работе') {
+            return 'bg-blue-400';
+        } else if (status === 'Завершен') {
+            return 'bg-green-500';
+        } else if (status === 'Отменен') {
+            return 'bg-grey-500';
+        } else {
+            return 'bg-black-500';
+        }
+    };
+
     const handleLink = async () => {
         if (foundContact) {
             // запрос на сервер для связывания найденного контакта с chat_id
             const result = await dispatch(
                 updateOneChat({ ...selectedChat, contact_id: foundContact.contact_id }),
             );
-            console.log('смена контакта в чате result.payload', result.payload);
             if (result.payload) {
                 await dispatch(
                     updateContact({
                         contact_id: foundContact.contact_id,
-                        contact_photo_url: selectedChat.chat_contact.contact_photo_url,
+                        contact_photo_url: foundContact.contact_photo_url
+                            ? foundContact.contact_photo_url
+                            : selectedChat.chat_contact.contact_photo_url,
+                        contact_getcourse: true,
                     }),
                 );
                 await dispatch(removeContact(selectedChat.contact_id));
@@ -153,7 +169,7 @@ function ContactSidebar() {
                                     <span className="font-medium">{item.label}</span>
                                 </Typography>
                             )}
-                        </div>
+                        </div> 
                     ))} */}
                 </div>
 
@@ -198,6 +214,31 @@ function ContactSidebar() {
                         </Typography>
                     ) : null}
                 </div>
+                {selectedChat.chat_contact.contact_cards.length > 0 && (
+                    <div className="flex flex-col">
+                        <div className="mb-4">Заказы:</div>
+                        {selectedChat.chat_contact.contact_cards.map((el, i) => (
+                            <div className="flex" key={i}>
+                                <div className="flex">
+                                    <div>{el.card_deal_title}</div>
+                                    <div
+                                        className={`${statusColor(
+                                            el.card_deal_status,
+                                        )} ml-4 mr-4 pl-4 pr-4 rounded-4 text-white`}
+                                    >
+                                        {el.card_deal_status}
+                                    </div>
+                                </div>
+
+                                <a
+                                    href={`https://beechat.ru/apps/scrumboard/boards/${el.board_id}/card/${el.card_id}`}
+                                >
+                                    открыть
+                                </a>
+                            </div>
+                        ))}
+                    </div>
+                )}
                 <div>
                     {!selectedChat.chat_contact.contact_getcourse ? (
                         <div className="flex flex-col p-24">

@@ -26,10 +26,12 @@ function ContactsApp() {
     const pageLayout = useRef(null);
     const routeParams = useParams();
     const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(50);
     const isMobile = useThemeMediaQuery((theme) => theme.breakpoints.down('lg'));
 
     useDeepCompareEffect(() => {
-        dispatch(getContacts());
+        dispatch(getContacts({ limit, page }));
         //dispatch(getCountries());
         //dispatch(getTags());
     }, [dispatch]);

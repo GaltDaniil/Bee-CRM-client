@@ -1,28 +1,28 @@
 import { useDebounce } from '@fuse/hooks';
 import { useState } from 'react';
 import _ from '@lodash';
-import { motion } from 'framer-motion';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import clsx from 'clsx';
 import Avatar from '@mui/material/Avatar';
 import Chip from '@mui/material/Chip';
 import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
-import InputAdornment from '@mui/material/InputAdornment';
 import List from '@mui/material/List';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import Autocomplete from '@mui/material/Autocomplete';
-import fromUnixTime from 'date-fns/fromUnixTime';
-import getUnixTime from 'date-fns/getUnixTime';
-import format from 'date-fns/format';
 import { Controller, useForm } from 'react-hook-form';
 import { SyntheticEvent, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from 'app/store';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import Box from '@mui/material/Box';
-import { closeCardDialog, removeCard, selectCardData, updateCard } from '../../../store/cardSlice';
+import {
+    closeCardDialog,
+    updateCardDialog,
+    removeCard,
+    selectCardData,
+    updateCard,
+} from '../../../store/cardSlice';
 import CardActivity from './activity/CardActivity';
 import CardAttachment from './attachment/CardAttachment';
 import CardChecklist from './checklist/CardChecklist';
@@ -46,7 +46,14 @@ import { ContactType } from 'src/app/main/apps/contacts/types/ContactType';
 import { selectUsers } from 'app/store/user/userListSlice';
 import UserType from 'app/store/user/UserType';
 import { UserListType } from 'app/store/user/UserListType';
-import { Card } from '@mui/material';
+import { Card, InputBase, Paper } from '@mui/material';
+import { getChatByContactId } from 'src/app/main/apps/chat/store/chatListSlice';
+import { sendMessage } from 'src/app/main/apps/chat/store/chatMessagesSlice';
+import { selectUser } from 'app/store/user/userSlice';
+import { useSelector } from 'react-redux';
+import { ChatListItemType } from 'src/app/main/apps/chat/types/ChatListItemType';
+import FuseLoading from '@fuse/core/FuseLoading';
+import { divide } from 'lodash';
 
 /**
  * The board card form component.
@@ -56,6 +63,7 @@ function BoardCardForm() {
     const { data: board } = useAppSelector(selectBoard);
     const labels = useAppSelector(selectLabels);
     const members = useAppSelector(selectMembers);
+    const user = useSelector(selectUser);
     const users = useAppSelector(selectUsers);
     const card = useAppSelector(selectCardData) as CardType;
     const list = useAppSelector(selectListById(card?.list_id));
@@ -72,6 +80,11 @@ function BoardCardForm() {
     const [isCopyDeal, setIsCopyDeal] = useState(false);
     const [isCopyPay, setIsCopyPay] = useState(false);
 
+    const [isChatOpen, setIsChatOpen] = useState(false);
+    const [isLoadingChat, setIsLoadingChat] = useState(false);
+    const [isChatData, setIsChatData] = useState<ChatListItemType>();
+    const [message_value, setMessageValue] = useState('');
+
     const updateCardData = useDebounce((newCard: CardType) => {
         dispatch(updateCard(newCard));
     }, 600);
@@ -80,11 +93,10 @@ function BoardCardForm() {
         if (!card) {
             return;
         }
-        console.log('card', card);
-        console.log('cardForm', cardForm);
-
+        const isEqual = _.isEqual(card, cardForm);
+        console.log('isEqual:', isEqual);
         if (!_.isEqual(card, cardForm)) {
-            console.log('запустился updateCardData(cardForm)');
+            console.log('запустился updateCardData(cardForm)', card, cardForm);
             updateCardData(cardForm);
         }
         if (isFiles) {
@@ -127,6 +139,65 @@ function BoardCardForm() {
         );
         setIsCalling(false);
     };
+
+    // WhatsApp start -----------------------
+    const chechWhatsapp = async (contact_phone, contact_id) => {
+        console.log('Начало проверки WA номера');
+        const response = await fetch(
+            `https://beechat.ru/api/wa/check?contact_phone=${contact_phone}&contact_id=${contact_id}`,
+            {
+                method: 'GET',
+            },
+        );
+        console.log('response', response);
+        const data = await response.json();
+        setValue('contact.contact_wa_status', data.contact_wa_status);
+    };
+    const openWaChat = async () => {
+        setIsChatOpen(true);
+        setIsLoadingChat(true);
+        const chat = await dispatch(getChatByContactId(card.contact.contact_id));
+
+        console.log('chat', chat.payload);
+        setIsChatData(chat.payload as ChatListItemType);
+        setIsLoadingChat(false);
+    };
+
+    function onMessageSubmit(ev: React.FormEvent<HTMLFormElement>) {
+        ev.preventDefault();
+        if (message_value === '') {
+            return;
+        }
+        setIsLoadingChat(true);
+        dispatch(
+            sendMessage({
+                message_value,
+                chat_id: isChatData.chat_id,
+                contact_id: card.contact.contact_id,
+                manager_id: user.user_id,
+                message_type: 'text',
+                messenger_id: isChatData.messenger_id,
+                messenger_type: isChatData.messenger_type,
+                attachments: [],
+            }),
+        ).then(() => {
+            setMessageValue('');
+            setIsChatOpen(false);
+        });
+    }
+
+    const handleKeyDown = (e) => {
+        if (e.keyCode === 13) {
+            // Код клавиши Enter
+            onMessageSubmit(e);
+        }
+    };
+
+    function onInputChange(ev: React.ChangeEvent<HTMLInputElement>) {
+        setMessageValue(ev.target.value);
+    }
+
+    // WhatsApp end -----------------------
 
     const handleFileChange = (e) => {
         console.log('запустился handleFileChange');
@@ -192,7 +263,7 @@ function BoardCardForm() {
             setIsCopyPay(true);
         }
     };
-
+    //console.log('card.contact', card.contact);
     return (
         <DialogContent className="flex flex-col sm:flex-row p-8">
             <div className="flex flex-auto flex-col py-16 px-0 sm:px-16">
@@ -309,6 +380,39 @@ function BoardCardForm() {
                                 size={20}
                             >
                                 heroicons-outline:phone
+                            </FuseSvgIcon>
+                        )}
+
+                        {card && card.contact && card.contact.contact_wa_status === null ? (
+                            <FuseSvgIcon
+                                className="ml-10 bg-blue p-2 rounded-4 text-white"
+                                size={20}
+                                onClick={() =>
+                                    chechWhatsapp(
+                                        card.contact.contact_phone,
+                                        card.contact.contact_id,
+                                    )
+                                }
+                            >
+                                heroicons-solid:annotation
+                            </FuseSvgIcon>
+                        ) : card && card.contact && card.contact.contact_wa_status === true ? (
+                            <FuseSvgIcon
+                                onClick={() => {
+                                    openWaChat();
+                                }}
+                                className="ml-10 bg-green p-2 rounded-4 text-white"
+                                size={20}
+                            >
+                                heroicons-solid:annotation
+                            </FuseSvgIcon>
+                        ) : (
+                            <FuseSvgIcon
+                                onClick={() => {}}
+                                className="ml-10 bg-grey p-2 rounded-4 text-white"
+                                size={20}
+                            >
+                                heroicons-solid:annotation
                             </FuseSvgIcon>
                         )}
                     </div>
@@ -698,6 +802,57 @@ function BoardCardForm() {
                     </div>
                 </Box>
             </div>
+            {isChatOpen ? (
+                <DialogContent className="flex justify-center  flex-col bg-green sm:flex-row p-8 absolute top-1/2 left-1/2 transform -translate-x-1/2  w-[calc(100%-20%)] -translate-y-1/2 z-50 rounded-[15px] shadow">
+                    <div className="flex-col p-10 justify-center items-center w-[calc(100%-20%)]">
+                        <div className="flex justify-between">
+                            <Typography className="m-4 mb-10 text-white">
+                                Написать сообщение в WhatsApp
+                            </Typography>
+                            <IconButton
+                                className="absolute top-4 right-4 text-white"
+                                color="inherit"
+                                onClick={() => setIsChatOpen(false)}
+                                size="large"
+                            >
+                                <FuseSvgIcon>heroicons-outline:x</FuseSvgIcon>
+                            </IconButton>
+                        </div>
+                        {!isLoadingChat ? (
+                            <Paper
+                                square
+                                component="form"
+                                onSubmit={onMessageSubmit}
+                                className=" border-t-1 bottom-0 right-0 left-0 py-16 px-16"
+                            >
+                                <div className="flex items-center relative ">
+                                    <InputBase
+                                        autoFocus={false}
+                                        id="message-input"
+                                        className=" flex  grow shrink-0 mx-8 px-16 border-2 resize-none whitespace-normal overflow-y-auto border-radius-10"
+                                        placeholder="Type your message"
+                                        onChange={onInputChange}
+                                        value={message_value}
+                                        onKeyDown={handleKeyDown}
+                                        multiline
+                                        sx={{
+                                            backgroundColor: 'background.paper',
+                                            maxHeight: '140px',
+                                        }} // Добавление динамического стиля
+                                    />
+                                    <IconButton type="submit" size="large">
+                                        <FuseSvgIcon className="rotate-90 " color="action">
+                                            heroicons-outline:paper-airplane
+                                        </FuseSvgIcon>
+                                    </IconButton>
+                                </div>
+                            </Paper>
+                        ) : (
+                            <div className="text-white flex justify-center "> Загрузка...</div>
+                        )}
+                    </div>
+                </DialogContent>
+            ) : null}
         </DialogContent>
     );
 }

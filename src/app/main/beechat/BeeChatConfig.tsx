@@ -1,6 +1,9 @@
 import { FuseRouteConfigType } from '@fuse/utils/FuseUtils';
 import { BeeChatPage } from './BeeChatPage';
 import { WidgetButtons } from './WidgetButtons';
+import MessagePage from './getcourseWidgets/waChatFrame';
+import ContactChatPage from './getcourseWidgets/contactChatFrame';
+import ChatPlusPage from './getcourseWidgets/ChatAppGetcourse/chatPlusPage';
 
 const BeeChatConfig: FuseRouteConfigType = {
     settings: {
@@ -33,6 +36,18 @@ const BeeChatConfig: FuseRouteConfigType = {
         {
             path: 'buttons',
             element: <WidgetButtons />,
+        },
+        {
+            path: 'waframe',
+            element: <MessagePage />,
+        },
+        {
+            path: 'contactchatframe',
+            element: <ContactChatPage />,
+        },
+        {
+            path: 'chatplus',
+            element: <ChatPlusPage />,
         },
     ],
 };

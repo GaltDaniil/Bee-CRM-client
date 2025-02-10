@@ -12,7 +12,7 @@ type BoardCardCheckItemsProps = {
  * The board card check items component.
  */
 function BoardCardCheckItems(props: BoardCardCheckItemsProps) {
-    const { card } = props;
+    /* const { card } = props;
 
     const checkItemsChecked = getCheckItemsChecked(card);
     const checkItems = getCheckItems(card);
@@ -52,7 +52,7 @@ function BoardCardCheckItems(props: BoardCardCheckItemsProps) {
             }
             label={`${checkItemsChecked}/${checkItems}`}
         />
-    );
+    ); */
 }
 
 export default BoardCardCheckItems;

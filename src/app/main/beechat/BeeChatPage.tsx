@@ -183,13 +183,13 @@ export const BeeChatPage: React.FC = (props) => {
         });
     }
     function isFirstMessageOfGroup(item: ChatMessageType, i: number) {
-        return i === 0 || (messages[i - 1] && messages[i - 1].contact_id !== item.contact_id);
+        return i === 0 || (messages[i - 1] && messages[i - 1].manager_id !== item.manager_id);
     }
 
     function isLastMessageOfGroup(item: ChatMessageType, i: number) {
         return (
             i === messages.length - 1 ||
-            (messages[i + 1] && messages[i + 1].contact_id !== item.contact_id)
+            (messages[i + 1] && messages[i + 1].manager_id !== item.manager_id)
         );
     }
 

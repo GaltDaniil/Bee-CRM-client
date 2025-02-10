@@ -21,7 +21,6 @@ type ChatAttachmentProps = {
  */
 function CardAttachment(props: ChatAttachmentProps) {
     const { attachment } = props;
-
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     const dateObject = new Date(attachment.createdAt);
@@ -59,8 +58,60 @@ function CardAttachment(props: ChatAttachmentProps) {
                 </div>
             );
         }
-        case 'link': {
-            /* return (
+        case 'photo': {
+            return (
+                <div className="flex flex-col w-full mb-16 px-16" key={attachment.attachment_id}>
+                    <div className="flex items-center justify-center min-w-128 w-128 ">
+                        <Paper className="overflow-hidden shadow">
+                            <img
+                                className="block w-full"
+                                src={attachment.attachment_src}
+                                alt="attachment"
+                            />
+                        </Paper>
+                    </div>
+                    <a
+                        className="text-white w-full mt-4 font-semibold whitespace-normal text-sm"
+                        color="white"
+                        target="_blank"
+                        href={attachment.attachment_src}
+                    >
+                        Открыть изображение
+                    </a>
+                </div>
+            );
+        }
+        case 'document': {
+            const isImage = /\jpg|jpeg|png$/i.test(attachment.attachment_extension);
+            return (
+                <div className="flex flex-col w-full mb-16 px-16" key={attachment.attachment_id}>
+                    <div className="flex items-center justify-center min-w-128 w-128">
+                        <Paper className="overflow-hidden shadow">
+                            <img
+                                className="block w-full"
+                                src={
+                                    isImage
+                                        ? attachment.attachment_src
+                                        : 'https://beechat.ru/assets/icons/doc.png'
+                                }
+                                alt="attachment"
+                            />
+                        </Paper>
+                    </div>
+
+                    <a
+                        className="text-white mt-4 font-semibold whitespace-normal text-sm"
+                        color="white"
+                        target="_blank"
+                        href={attachment.attachment_src}
+                    >
+                        Открыть документ
+                    </a>
+                </div>
+            );
+        }
+        /* case 'link': {
+            return (
                 <div className="flex w-full sm:w-1/2 mb-16 px-16" key={attachment.attachment_id}>
                     <Paper className="min-w-128 w-128 h-128 flex items-center justify-center rounded-4 overflow-hidden shadow">
                         <Typography className="font-semibold">LINK</Typography>
@@ -100,10 +151,11 @@ function CardAttachment(props: ChatAttachmentProps) {
                         </Menu>
                     </div>
                 </div>
-            ); */
-        }
-        case 'file': {
-            /* return (
+            );
+        } */
+
+        /* case 'file': {
+            return (
                 <div className="flex w-full sm:w-1/2 mb-16 px-16" key={attachment.attachment_id}>
                     <Paper className="min-w-128 w-128 h-128 flex items-center justify-center rounded-4 overflow-hidden shadow">
                         <Typography className="font-semibold">LINK</Typography>
@@ -143,8 +195,8 @@ function CardAttachment(props: ChatAttachmentProps) {
                         </Menu>
                     </div>
                 </div>
-            ); */
-        }
+            );
+        } */
         case 'market': {
             return (
                 <div className="flex w-full sm:w-1/2 mb-16 px-16" key={attachment.attachment_id}>

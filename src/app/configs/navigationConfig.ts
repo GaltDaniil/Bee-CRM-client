@@ -54,6 +54,14 @@ const navigationConfig: FuseNavigationType = [
                 url: '/apps/scrumboard',
                 translate: 'CRM',
             },
+            {
+                id: 'apps.orders',
+                title: 'Orders',
+                type: 'item',
+                icon: 'heroicons-outline:view-boards',
+                url: '/apps/orders',
+                translate: 'ORDERS',
+            },
         ],
     },
 ];
