@@ -42,7 +42,7 @@ function CardAttachment(props: ChatAttachmentProps) {
                         <Paper className="overflow-hidden shadow">
                             <img
                                 className="block w-full"
-                                src={attachment.attachment_src}
+                                src={attachment.attachment_url}
                                 alt="attachment"
                             />
                         </Paper>
@@ -51,7 +51,7 @@ function CardAttachment(props: ChatAttachmentProps) {
                         className="text-white w-full mt-4 font-semibold whitespace-normal text-sm"
                         color="white"
                         target="_blank"
-                        href={attachment.attachment_src}
+                        href={attachment.attachment_url}
                     >
                         Открыть изображение
                     </a>
@@ -91,7 +91,7 @@ function CardAttachment(props: ChatAttachmentProps) {
                                 className="block w-full"
                                 src={
                                     isImage
-                                        ? attachment.attachment_src
+                                        ? attachment.attachment_url
                                         : 'https://beechat.ru/assets/icons/doc.png'
                                 }
                                 alt="attachment"
@@ -106,6 +106,36 @@ function CardAttachment(props: ChatAttachmentProps) {
                         href={attachment.attachment_url}
                     >
                         Открыть документ
+                    </a>
+                </div>
+            );
+        }
+        case 'voice': {
+            return (
+                <div className="flex flex-col w-full mb-16 px-16" key={attachment.attachment_id}>
+                    <div className="flex items-center justify-center w-full max-w-md">
+                        <Paper className="flex items-center w-full p-2 shadow">
+                            <audio
+                                controls
+                                className="w-full"
+                                style={{
+                                    height: '40px', // Компактный размер, как в мессенджерах
+                                    background: '#f0f0f0', // Светлый фон
+                                    borderRadius: '8px', // Закругленные углы
+                                }}
+                            >
+                                <source src={attachment.attachment_url} type="audio/mpeg" />
+                                Your browser does not support the audio element.
+                            </audio>
+                        </Paper>
+                    </div>
+                    <a
+                        className="text-white mt-4 font-semibold whitespace-normal text-sm"
+                        color="white"
+                        target="_blank"
+                        href={attachment.attachment_url}
+                    >
+                        Скачать аудио
                     </a>
                 </div>
             );
