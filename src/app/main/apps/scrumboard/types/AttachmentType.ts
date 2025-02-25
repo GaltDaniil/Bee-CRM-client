@@ -15,5 +15,10 @@ export type AttachmentType = {
         photo_url: string;
         description: string;
     };
+    attachment_replay?: {
+        sender_name: string; // Имя автора исходного сообщения
+        message_text?: string; // Текст исходного сообщения (если есть)
+        attachment?: AttachmentType; // Вложение из исходного сообщения (если есть)
+    };
     createdAt: Date;
 };

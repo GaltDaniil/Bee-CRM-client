@@ -23,7 +23,6 @@ import UserAvatar from '../../apps/chat/UserAvatar';
 import { ChatAppContext } from '../../apps/chat/ChatApp';
 import { ChatMessagesType, ChatMessageType } from '../../apps/chat/types/ChatMessageType';
 import Error404Page from '../../404/Error404Page';
-
 import {
     selectChatById,
     getChatList,
@@ -355,6 +354,7 @@ function ContactChatPage(props: ChatPropsType) {
                     contact_id: activeChat.contact_id,
                     manager_id: user.user_id,
                     message_type: 'text',
+                    message_from: 'crm',
                     messenger_type: activeChat.messenger_type,
                     messenger_id: activeChat.messenger_id,
                     attachments: [],

@@ -176,6 +176,7 @@ function BoardCardForm() {
                 contact_id: card.contact.contact_id,
                 manager_id: user.user_id,
                 message_type: 'text',
+                message_from: 'crm',
                 messenger_id: isChatData.messenger_id,
                 messenger_type: isChatData.messenger_type,
                 attachments: [],

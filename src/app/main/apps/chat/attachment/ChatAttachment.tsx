@@ -61,11 +61,11 @@ function CardAttachment(props: ChatAttachmentProps) {
         case 'photo': {
             return (
                 <div className="flex flex-col w-full mb-16 px-16" key={attachment.attachment_id}>
-                    <div className="flex items-center justify-center min-w-128 w-128 ">
+                    <div className="flex items-center justifyW-center min-w-128 w-128 ">
                         <Paper className="overflow-hidden shadow">
                             <img
                                 className="block w-full"
-                                src={attachment.attachment_src}
+                                src={attachment.attachment_url}
                                 alt="attachment"
                             />
                         </Paper>
@@ -74,7 +74,7 @@ function CardAttachment(props: ChatAttachmentProps) {
                         className="text-white w-full mt-4 font-semibold whitespace-normal text-sm"
                         color="white"
                         target="_blank"
-                        href={attachment.attachment_src}
+                        href={attachment.attachment_url}
                     >
                         Открыть изображение
                     </a>
@@ -103,13 +103,31 @@ function CardAttachment(props: ChatAttachmentProps) {
                         className="text-white mt-4 font-semibold whitespace-normal text-sm"
                         color="white"
                         target="_blank"
-                        href={attachment.attachment_src}
+                        href={attachment.attachment_url}
                     >
                         Открыть документ
                     </a>
                 </div>
             );
         }
+        /* case 'forwarded': { // Обработка пересланны х сообщений
+            return (
+                <div className="flex flex-col w-full mb-16 px-16 border-l-4 border-blue-500 bg-gray-800 p-4 rounded-lg" key={attachment.attachment_id}>
+                    
+                    <span className="text-blue-400 font-semibold">{attachment.forwarded_from_name || 'Неизвестный'}</span>
+                    
+                    
+                    <div className="text-gray-300 text-sm mt-1">{attachment.forwarded_message || 'Сообщение недоступно'}</div>
+        
+                    
+                    {attachment.forwarded_attachments?.map((nestedAttachment) => (
+                        <div className="mt-2" key={nestedAttachment.attachment_id}>
+                            {renderAttachment(nestedAttachment)}
+                        </div>
+                    ))}
+                </div>
+            );
+        } */
         /* case 'link': {
             return (
                 <div className="flex w-full sm:w-1/2 mb-16 px-16" key={attachment.attachment_id}>
