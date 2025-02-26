@@ -42,7 +42,7 @@ function CardAttachment(props: ChatAttachmentProps) {
                         <Paper className="overflow-hidden shadow">
                             <img
                                 className="block w-full"
-                                src={attachment.attachment_url}
+                                src={attachment.attachment_src}
                                 alt="attachment"
                             />
                         </Paper>
@@ -51,7 +51,7 @@ function CardAttachment(props: ChatAttachmentProps) {
                         className="text-white w-full mt-4 font-semibold whitespace-normal text-sm"
                         color="white"
                         target="_blank"
-                        href={attachment.attachment_url}
+                        href={attachment.attachment_src}
                     >
                         Открыть изображение
                     </a>
@@ -65,7 +65,7 @@ function CardAttachment(props: ChatAttachmentProps) {
                         <Paper className="overflow-hidden shadow">
                             <img
                                 className="block w-full"
-                                src={attachment.attachment_url}
+                                src={attachment.attachment_src}
                                 alt="attachment"
                             />
                         </Paper>
@@ -74,7 +74,7 @@ function CardAttachment(props: ChatAttachmentProps) {
                         className="text-white w-full mt-4 font-semibold whitespace-normal text-sm"
                         color="white"
                         target="_blank"
-                        href={attachment.attachment_url}
+                        href={attachment.attachment_src}
                     >
                         Открыть изображение
                     </a>
