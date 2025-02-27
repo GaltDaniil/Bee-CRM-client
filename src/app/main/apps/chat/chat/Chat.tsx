@@ -397,7 +397,6 @@ function Chat(props: ChatPropsType) {
                                             >
                                                 <div className="bubble flex relative items-center justify-center p-12 max-w-full">
                                                     <div className="leading-tight whitespace-pre-wrap">
-                                                        {item.message_value}
                                                         {item.attachments
                                                             ? item.attachments.map(
                                                                   (attachment, index) => (
@@ -412,6 +411,7 @@ function Chat(props: ChatPropsType) {
                                                                   ),
                                                               )
                                                             : null}
+                                                        {item.message_value}
                                                         <div
                                                             className="text-11 opacity-60 mt-4"
                                                             color="text.secondary "

@@ -123,7 +123,7 @@ function CardAttachment(props: CardAttachmentProps) {
                     </Paper>
                     <div className="flex flex-auto flex-col justify-center items-start min-w-0 px-16">
                         <Typography className="text-16 font-semibold truncate w-full">
-                            {item.attachment_url}
+                            {item.attachment_src}
                         </Typography>
                         <Typography className="truncate w-full mb-12" color="text.secondary">
                             {time}
